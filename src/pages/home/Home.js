@@ -1,30 +1,40 @@
 import React, { useContext } from "react";
-import LeftBar from "../../components/leftbar/LeftBar";
-import Navbar from "../../components/navbar/Navbar";
-import { AuthContext } from "../../context/AuthContext";
+import { Layout, theme, Breadcrumb } from "antd";
+
 import "./home.css";
 
 const Home = () => {
-  const { logout } = useContext(AuthContext);
-  function handleClick() {
-    logout();
-  }
-  return (
-    <div className="home">
-      <div className="home--navbar">
-        <Navbar />
-      </div>
-      <div className="home--bottom">
-        <div className="home--bottom--left">
-          <LeftBar />
-        </div>
-        <div className="home--bottom--right">
-          <h1>Home Page</h1>
-        </div>
-      </div>
+  const { Content } = Layout;
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
 
-      <button onClick={handleClick}>LogOut</button>
-    </div>
+  return (
+    <Layout
+      style={{
+        padding: "0 24px 24px",
+      }}
+    >
+      <Breadcrumb
+        style={{
+          margin: "16px 0",
+        }}
+      >
+        <Breadcrumb.Item>Home</Breadcrumb.Item>
+        <Breadcrumb.Item>List</Breadcrumb.Item>
+        <Breadcrumb.Item>App</Breadcrumb.Item>
+      </Breadcrumb>
+      <Content
+        style={{
+          padding: 24,
+          margin: 0,
+          minHeight: 280,
+          background: colorBgContainer,
+        }}
+      >
+        Home Page
+      </Content>
+    </Layout>
   );
 };
 

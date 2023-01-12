@@ -1,17 +1,46 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Navigate, useNavigate } from "react-router-dom";
+import { login } from "../../api/auth/login";
 import { AuthContext } from "../../context/AuthContext";
+import { addUser } from "../../features/user/userSlice";
 import "./login.css";
-import { Button } from "@mui/material";
 
 const Login = () => {
-  const { login, loginError } = useContext(AuthContext);
+  const { setToken, setUser, setCompany } = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const userRef = useRef();
+  const errRef = useRef();
+  const [errMsg, setErrMsg] = useState();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleClick = async () => {
+  useEffect(() => {
+    userRef.current.focus();
+  }, []);
+  useEffect(() => {
+    setErrMsg("");
+  }, [email, password]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (email && password) {
-      // Send data to the backend via POST
-      await login(email, password);
+      const res = JSON.parse(await login(email, password));
+      console.log(res);
+      if (res?.data?.statusCode === 401) {
+        console.log(res.data.message);
+        setErrMsg(res?.data.message);
+      }
+      if (res?.user) {
+        dispatch(addUser(res?.user));
+        navigate("/");
+        setUser(res.user);
+        setCompany(res.company);
+        setToken(res.access_token);
+      }
     }
   };
 
@@ -20,24 +49,30 @@ const Login = () => {
       <div className="login--container">
         <h1>Software Name</h1>
         <h3>Sign In</h3>
-        {loginError && <div className="error">{`${loginError}`}</div>}
+        {errMsg && <div className="error">{`${errMsg}`}</div>}
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="email">Email: </label>
+          <input
+            type={"email"}
+            id="email"
+            ref={userRef}
+            placeholder="Email"
+            value={email}
+            required
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <label htmlFor="password">Password: </label>
+          <input
+            type={"password"}
+            id="password"
+            placeholder="Password"
+            value={password}
+            required
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-        <input
-          type={"email"}
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type={"password"}
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <Button variant="contained" onClick={handleClick} color="success">
-          Login
-        </Button>
+          <button>Login</button>
+        </form>
       </div>
     </div>
   );

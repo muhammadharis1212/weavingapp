@@ -1,31 +1,24 @@
 import React, { useContext, useState, useEffect } from "react";
+import { getAllVendors } from "../../api/vendors/getAllVendors";
+import VendorListing from "../../components/VendorListing/VendorListing";
 import { AuthContext } from "../../context/AuthContext";
+import VendorTable from "../../features/vendors/VendorTable";
 
 const Vendors = () => {
-  const { user, token } = useContext(AuthContext);
-  const [vendors, setVendors] = useState({});
+  const { company, token } = useContext(AuthContext);
+
   useEffect(() => {
-    //fetch user details
-    const userDetail = async (bearer_token) => {
-      await fetch("http://localhost:5000/vendors", {
-        // Enter your IP address here
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + bearer_token,
-        },
-      })
-        .then((res) => {
-          return res.json();
-        })
-        .then((data) => {
-          console.log(data);
-          return setVendors(data);
-        });
+    const vendors = async (token, companyId) => {
+      const response = await getAllVendors(token, companyId);
     };
-    userDetail(token);
-    console.log("Finished useEffect in Vendors");
-  }, [token, user]);
-  return <div>Vendors</div>;
+    vendors(token, company.id);
+  }, []);
+  return (
+    <div>
+      <VendorTable />
+      <VendorListing />
+    </div>
+  );
 };
 
 export default Vendors;

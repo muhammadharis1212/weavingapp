@@ -1,0 +1,10 @@
+.items--container {
+  margin-left: 20px;
+  margin-right: 20px;
+  width: 100%;
+}
+.items--header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
