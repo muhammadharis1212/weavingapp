@@ -1,0 +1,32 @@
+.createItem--container{
+    width: 100%;
+    h2{
+        margin: 0;
+    }
+    .divider{
+        margin: 5px, 0, 15px, 0;
+    }
+    .createItem--body{
+        display: flex;
+        flex-direction: column;
+        .create--item--form{
+            width: 100%;
+           .item--info{
+            width: 40%;
+           }
+            .ant-form-item {
+            
+                    justify-content: space-between;
+                }
+            .form--buttons{
+                display: flex;
+                justify-content: flex-end;
+                .btn--create{
+                   
+                    margin-right: 10px;
+                }
+                
+            }
+        }
+        }
+    }

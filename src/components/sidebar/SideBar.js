@@ -1,7 +1,6 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import DashboardIcon from "@mui/icons-material/Dashboard";
 import StoreIcon from "@mui/icons-material/Store";
 import GroupIcon from "@mui/icons-material/Group";
 import { ShoppingBagOutlined } from "@mui/icons-material";
@@ -12,10 +11,13 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
 import AccountBoxOutlinedIcon from "@mui/icons-material/AccountBoxOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import "./sideBar.scss";
 
 import { Layout, theme, Menu } from "antd";
+import { AuthContext } from "../../context/AuthContext";
 
 const SideBar = () => {
+  const { company } = useContext(AuthContext);
   const navigate = useNavigate();
   const [current, setCurrent] = useState("/");
   //Function to get SideBar Menu Items
@@ -58,14 +60,11 @@ const SideBar = () => {
     navigate(e.key);
   };
   return (
-    <Sider
-      className="sidebar"
-      width={250}
-      style={{
-        background: colorBgContainer,
-        height: "93vh",
-      }}
-    >
+    <div>
+      <div>
+        <p className="title">{company?.name || "ERP"}</p>
+      </div>
+
       <Menu
         mode="inline"
         theme="dark"
@@ -78,7 +77,7 @@ const SideBar = () => {
         }}
         items={sideBarItems}
       />
-    </Sider>
+    </div>
   );
 };
 

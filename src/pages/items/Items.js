@@ -4,7 +4,7 @@ import React from "react";
 import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
 import ItemsTable from "../../features/items/ItemsTable";
 import CreateItem from "./CreateItem";
-import "./items.css";
+import "./items.scss";
 
 const Items = () => {
   const navigate = useNavigate();

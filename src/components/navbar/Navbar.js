@@ -1,16 +1,10 @@
 import React, { useContext } from "react";
-import { Box, IconButton, useTheme } from "@mui/material";
 import { AuthContext } from "../../context/AuthContext";
-import "./navbar.css";
-import LogoutIcon from "@mui/icons-material/Logout";
-import Brightness4TwoToneIcon from "@mui/icons-material/Brightness4TwoTone";
-import Brightness4OutlinedIcon from "@mui/icons-material/Brightness4Outlined";
-import { Menu, Layout, theme } from "antd";
-import Title from "antd/es/typography/Title";
+import { Layout, Button } from "antd";
 import { useNavigate } from "react-router-dom";
+import { PoweroffOutlined } from "@ant-design/icons";
 
 const Navbar = () => {
-  const { Header } = Layout;
   const navigate = useNavigate();
 
   //Navbar Icons Mapping
@@ -27,7 +21,7 @@ const Navbar = () => {
     getItem(
       "",
       "logout",
-      <LogoutIcon onClick={handleClick} style={{ height: 25, width: 25 }} />
+      <Button type="primary" placeholder="Logout" onClick={handleClick} />
     ),
   ];
 
@@ -36,27 +30,18 @@ const Navbar = () => {
     navigate("/auth/login");
   }
   return (
-    <Layout>
-      <Header
-        className="header"
-        style={{
-          height: "7vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Title level={3} type="warning">
-          Weaving ERP
-        </Title>
-        <Menu
-          style={{ fontSize: "20px" }}
-          theme="dark"
-          mode="horizontal"
-          items={navItems}
-        />
-      </Header>
-    </Layout>
+    <div
+      style={{
+        paddingRight: "10px",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "end",
+      }}
+    >
+      <PoweroffOutlined onClick={handleClick} />
+    </div>
   );
 };
 

@@ -34,40 +34,27 @@ const User = () => {
     } else navigate("");
   };
   return (
-    <Layout
-      style={{
-        padding: "24px 24px 0 24px",
-      }}
-    >
-      <Content
-        style={{
-          padding: 24,
-          margin: 0,
-          minHeight: 280,
-          background: colorBgContainer,
-        }}
-      >
-        <Tabs
-          type="card"
-          defaultActiveKey="profile"
-          //activeKey={`${tab}`}
-          onTabClick={clickHandler}
-          size={"large"}
-          items={[
-            {
-              label: "Profile",
-              key: "profile",
-              children: <Profile userInfo={userInfo} />,
-            },
-            {
-              label: "Update",
-              key: "update",
-              children: <EditProfile userInfo={userInfo} />,
-            },
-          ]}
-        />
-      </Content>
-    </Layout>
+    <div>
+      <Tabs
+        type="card"
+        defaultActiveKey="profile"
+        //activeKey={`${tab}`}
+        onTabClick={clickHandler}
+        size={"large"}
+        items={[
+          {
+            label: "Profile",
+            key: "profile",
+            children: <Profile userInfo={userInfo} />,
+          },
+          {
+            label: "Update",
+            key: "update",
+            children: <EditProfile userInfo={userInfo} />,
+          },
+        ]}
+      />
+    </div>
   );
 };
 
