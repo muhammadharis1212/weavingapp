@@ -3,7 +3,6 @@ import axios from "axios";
 
 export async function getAllItems(token) {
   try {
-    console.log("Api : ", token);
     const response = await axios.get(GET_ALL_Items, {
       headers: {
         "content-type": "application/json",

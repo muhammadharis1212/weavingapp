@@ -9,6 +9,7 @@ import EditProfile from "./pages/user/EditProfile";
 import User from "./pages/user/User";
 import Vendors from "./pages/vendors/Vendors";
 import CreateItem from "./pages/items/CreateItem";
+import ChartOfAccounts from "./pages/chartofaccounts/ChartOfAccounts";
 const { Header, Footer, Sider, Content } = Layout;
 
 function App() {
@@ -87,6 +88,7 @@ function App() {
 
         <Route path="items" element={<Items />}></Route>
         <Route path="items/new" element={<CreateItem />} />
+        <Route path="chartofaccounts" element={<ChartOfAccounts />} />
 
         <Route path="vendors" element={<Vendors />} />
         <Route path="/auth/login" element={<Login />} />

@@ -5,7 +5,12 @@ import StoreIcon from "@mui/icons-material/Store";
 import GroupIcon from "@mui/icons-material/Group";
 import { ShoppingBagOutlined } from "@mui/icons-material";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
-import { DollarCircleOutlined, DashboardOutlined } from "@ant-design/icons";
+import {
+  DollarCircleOutlined,
+  DashboardOutlined,
+  UserOutlined,
+  ProfileOutlined,
+} from "@ant-design/icons";
 import RequestQuoteOutlinedIcon from "@mui/icons-material/RequestQuoteOutlined";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
@@ -46,6 +51,9 @@ const SideBar = () => {
     ]),
     getItem("Account", "sub4", <AccountBoxOutlinedIcon />, [
       getItem("Profile", "user", <BadgeOutlinedIcon />),
+    ]),
+    getItem("Accountant", "sub5", <UserOutlined />, [
+      getItem("Chart of Accounts", "chartofaccounts"),
     ]),
   ];
   //config
