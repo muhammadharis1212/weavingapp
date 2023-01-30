@@ -1,5 +1,5 @@
 import { Layout, theme } from "antd";
-import { Outlet, Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
 import SideBar from "./components/sidebar/SideBar";
 import Home from "./pages/home/Home";
@@ -7,15 +7,26 @@ import Items from "./pages/items/Items";
 import Login from "./pages/Login/Login";
 import EditProfile from "./pages/user/EditProfile";
 import User from "./pages/user/User";
-import Vendors from "./pages/vendors/Vendors";
 import CreateItem from "./pages/items/CreateItem";
 import ChartOfAccounts from "./pages/chartofaccounts/ChartOfAccounts";
-const { Header, Footer, Sider, Content } = Layout;
+import Party from "./pages/party/Party";
+import PartyView from "./pages/party/PartyView";
+import CreatePartyView from "./pages/party/CreatePartyView";
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
+import Suppliers from "./pages/suppliers/Suppliers";
+import CreateSupplier from "./pages/suppliers/CreateSupplier";
+import CreateCustomerView from "./pages/customers/CreateCustomerView";
+import SupplierView from "./pages/suppliers/SupplierView";
+import NewBillView from "./pages/bills/NewBillView";
+import TableForm from "./components/tableform/TableForm";
+const { Header, Sider, Content } = Layout;
 
 function App() {
-  const token = sessionStorage.getItem("token");
+  const { token } = theme.useToken();
+  const { authToken } = useContext(AuthContext);
   const ProtectedRoute = ({ children }) => {
-    if (!token) {
+    if (!authToken) {
       //return <Navigate to="/login" />;
     }
 
@@ -27,7 +38,7 @@ function App() {
       token: { colorBgContainer },
     } = theme.useToken();
     return (
-      <Layout style={{ minHeight: "100vh" }}>
+      <Layout>
         <Sider
           style={{
             overflow: "auto",
@@ -48,30 +59,27 @@ function App() {
         >
           <Header
             style={{
+              height: "10vh",
               padding: 0,
-              background: colorBgContainer,
+              background: "#f7f7fe",
+              position: "sticky",
+              top: 0,
+              zIndex: 1,
             }}
           >
             <Navbar />
           </Header>
           <Content
             style={{
-              margin: "20px 10px 0",
-              padding: 15,
-              overflow: "initial",
+              paddingLeft: 20,
+              paddingRight: 20,
+              paddingTop: 10,
               background: colorBgContainer,
-              borderRadius: "10px",
+              height: "90vh",
             }}
           >
             <AppRoutes />
           </Content>
-          <Footer
-            style={{
-              textAlign: "center",
-            }}
-          >
-            HNSoft ©2023
-          </Footer>
         </Layout>
       </Layout>
     );
@@ -89,9 +97,16 @@ function App() {
         <Route path="items" element={<Items />}></Route>
         <Route path="items/new" element={<CreateItem />} />
         <Route path="chartofaccounts" element={<ChartOfAccounts />} />
-
-        <Route path="vendors" element={<Vendors />} />
+        <Route path="party" element={<Party />} />
+        <Route path="party/:id" element={<PartyView />} />
+        <Route path="party/new" element={<CreatePartyView />} />
+        <Route path="suppliers" element={<Suppliers />} />
+        <Route path="suppliers/new" element={<CreateSupplier />} />
+        <Route path="suppliers/:id" element={<SupplierView />} />
+        <Route path="bills/new" element={<NewBillView />} />
+        <Route path="customers/new" element={<CreateCustomerView />} />
         <Route path="/auth/login" element={<Login />} />
+        <Route path="tableform" element={<TableForm />} />
       </Routes>
     );
   };

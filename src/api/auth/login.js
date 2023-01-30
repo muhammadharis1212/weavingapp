@@ -11,9 +11,12 @@ export async function login(email, password) {
       }
     );
 
-    sessionStorage.setItem("token", response?.data?.access_token);
-    sessionStorage.setItem("user", JSON.stringify(response?.data?.user));
-    sessionStorage.setItem("company", JSON.stringify(response?.data?.company));
+    sessionStorage.setItem("authToken", response?.data?.access_token);
+    sessionStorage.setItem("authUser", JSON.stringify(response?.data?.user));
+    sessionStorage.setItem(
+      "authCompany",
+      JSON.stringify(response?.data?.company)
+    );
 
     return JSON.stringify(response?.data);
   } catch (error) {

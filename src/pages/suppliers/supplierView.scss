@@ -1,0 +1,19 @@
+.supplier--menu{
+    display: flex;
+    ul{
+        display: flex;
+        list-style: none;	
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        gap: 20px;
+        li{
+            padding: 5px 10px;
+            font-weight: 400;
+            
+        }
+        .li--selected{
+            border-bottom: 3px solid blue;
+        }
+    }
+}

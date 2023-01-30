@@ -4,34 +4,34 @@ import { useState } from "react";
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
-  const [token, setToken] = useState(getToken());
-  const [user, setUser] = useState(getUser());
-  const [company, setCompany] = useState(getCompany());
+  const [authToken, setAuthToken] = useState(getAuthToken());
+  const [authUser, setAuthUser] = useState(getAuthUser());
+  const [authCompany, setAuthCompany] = useState(getAuthCompany());
 
-  function getToken() {
-    const token = sessionStorage.getItem("token");
-    return token;
+  function getAuthToken() {
+    const authToken = sessionStorage.getItem("authToken");
+    return authToken;
   }
-  function getUser() {
-    const user = sessionStorage.getItem("user");
-    if (user) return JSON.parse(user);
-    return user;
+  function getAuthUser() {
+    const authUser = sessionStorage.getItem("authUser");
+    if (authUser) return JSON.parse(authUser);
+    return authUser;
   }
-  function getCompany() {
-    const company = sessionStorage.getItem("company");
-    if (company) return JSON.parse(company);
-    return company;
+  function getAuthCompany() {
+    const authCompany = sessionStorage.getItem("authCompany");
+    if (authCompany) return JSON.parse(authCompany);
+    return authCompany;
   }
 
   return (
     <AuthContext.Provider
       value={{
-        token,
-        user,
-        company,
-        setToken,
-        setUser,
-        setCompany,
+        authToken,
+        authUser,
+        authCompany,
+        setAuthToken,
+        setAuthUser,
+        setAuthCompany,
       }}
     >
       {children}

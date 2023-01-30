@@ -2,7 +2,6 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import React from "react";
 import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
-import ItemsTable from "../../features/items/ItemsTable";
 import CreateItem from "./CreateItem";
 import "./items.scss";
 
@@ -20,9 +19,7 @@ const Items = () => {
           New
         </Button>
       </div>
-      <div>
-        <ItemsTable />
-      </div>
+      <div>Items Table</div>
     </div>
   );
 };

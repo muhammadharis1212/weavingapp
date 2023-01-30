@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import TextArea from "antd/es/input/TextArea";
 import { getAccountGroups } from "../../api/chartofaccounts/accountgroups/getAccountGroups";
 
-const CreateAccountView = ({ open, setOpen, token }) => {
+const CreateAccountView = ({ open, setOpen, token, setFetchFlag }) => {
   const [groups, setGroups] = useState([]);
+  console.log(groups);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
-
   const [messageApi, contextHolder] = message.useMessage();
   const success = () => {
     messageApi.open({
@@ -27,9 +27,10 @@ const CreateAccountView = ({ open, setOpen, token }) => {
     setConfirmLoading(true);
     error();
     setTimeout(() => {
-      //setOpen(false);
+      setOpen(false);
       setConfirmLoading(false);
       success();
+      setFetchFlag((prev) => !prev);
     }, 2000);
   };
   const handleCancel = () => {
@@ -45,7 +46,7 @@ const CreateAccountView = ({ open, setOpen, token }) => {
   };
 
   useEffect(() => {
-    const res = (async () => {
+    (async () => {
       const data = await getAccountGroups(token);
       setGroups(() => data);
     })();
@@ -87,7 +88,7 @@ const CreateAccountView = ({ open, setOpen, token }) => {
                 {
                   label: "Assets",
                   options: groups
-                    .filter((group) => group.rootTypeId === "Assets")
+                    .filter((group) => group.rootType.name === "Assets")
                     .map((group) => {
                       return { label: group.name, value: group.id };
                     }),
@@ -95,7 +96,7 @@ const CreateAccountView = ({ open, setOpen, token }) => {
                 {
                   label: "Equity",
                   options: groups
-                    .filter((group) => group.rootTypeId === "Equity")
+                    .filter((group) => group.rootType.name === "Equity")
                     .map((group) => {
                       return { label: group.name, value: group.id };
                     }),
@@ -103,7 +104,7 @@ const CreateAccountView = ({ open, setOpen, token }) => {
                 {
                   label: "Liabilities",
                   options: groups
-                    .filter((group) => group.rootTypeId === "Liabilities")
+                    .filter((group) => group.rootType.name === "Liabilities")
                     .map((group) => {
                       return { label: group.name, value: group.id };
                     }),
@@ -111,7 +112,7 @@ const CreateAccountView = ({ open, setOpen, token }) => {
                 {
                   label: "Revenue",
                   options: groups
-                    .filter((group) => group.rootTypeId === "Revenues")
+                    .filter((group) => group.rootType.name === "Revenue")
                     .map((group) => {
                       return { label: group.name, value: group.id };
                     }),
@@ -119,7 +120,7 @@ const CreateAccountView = ({ open, setOpen, token }) => {
                 {
                   label: "Expense",
                   options: groups
-                    .filter((group) => group.rootTypeId === "Expenses")
+                    .filter((group) => group.rootType.name === "Expenses")
                     .map((group) => {
                       return { label: group.name, value: group.id };
                     }),

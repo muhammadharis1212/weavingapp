@@ -7,7 +7,7 @@ import { addUser } from "../../features/user/userSlice";
 import "./login.css";
 
 const Login = () => {
-  const { setToken, setUser, setCompany } = useContext(AuthContext);
+  const { setAuthToken, setAuthUser, setAuthCompany } = useContext(AuthContext);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -37,9 +37,9 @@ const Login = () => {
       if (res?.user) {
         dispatch(addUser(res?.user));
         navigate("/");
-        setUser(res.user);
-        setCompany(res.company);
-        setToken(res.access_token);
+        setAuthUser(res.user);
+        setAuthCompany(res.company);
+        setAuthToken(res.access_token);
       }
     }
   };

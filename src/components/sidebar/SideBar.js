@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import StoreIcon from "@mui/icons-material/Store";
 import GroupIcon from "@mui/icons-material/Group";
@@ -9,7 +9,6 @@ import {
   DollarCircleOutlined,
   DashboardOutlined,
   UserOutlined,
-  ProfileOutlined,
 } from "@ant-design/icons";
 import RequestQuoteOutlinedIcon from "@mui/icons-material/RequestQuoteOutlined";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
@@ -18,10 +17,12 @@ import AccountBoxOutlinedIcon from "@mui/icons-material/AccountBoxOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import "./sideBar.scss";
 
-import { Layout, theme, Menu } from "antd";
+import { Menu } from "antd";
 import { AuthContext } from "../../context/AuthContext";
 
 const SideBar = () => {
+  const location = useLocation();
+  console.log(location);
   const { company } = useContext(AuthContext);
   const navigate = useNavigate();
   const [current, setCurrent] = useState("/");
@@ -38,29 +39,28 @@ const SideBar = () => {
   //Array of Items to be display in the sidebar
   const sideBarItems = [
     getItem("Dashboard", "/", <DashboardOutlined />),
-    getItem("Sales", "sub1", <DollarCircleOutlined />, [
+    getItem("Inventory", "sub1", <Inventory2OutlinedIcon />, [
+      getItem("Items", "items", <PostAddOutlinedIcon />),
+    ]),
+    getItem("Sales", "sub2", <DollarCircleOutlined />, [
       getItem("Customers", "customers", <GroupIcon />),
       getItem("Invoices", "3", <RequestQuoteOutlinedIcon />),
     ]),
-    getItem("Purchases", "sub2", <ShoppingBagOutlined />, [
-      getItem("Vendors", "vendors", <StoreIcon />),
-      getItem("Bills", "5", <ReceiptLongOutlinedIcon />),
+
+    getItem("Purchases", "sub3", <ShoppingBagOutlined />, [
+      getItem("Suppliers", "suppliers", <StoreIcon />),
+      getItem("Bills", "bills", <ReceiptLongOutlinedIcon />),
     ]),
-    getItem("Inventory", "sub3", <Inventory2OutlinedIcon />, [
-      getItem("Items", "items", <PostAddOutlinedIcon />),
+    getItem("Common", "sub4", <AccountBoxOutlinedIcon />, [
+      getItem("Party", "party", <BadgeOutlinedIcon />),
     ]),
-    getItem("Account", "sub4", <AccountBoxOutlinedIcon />, [
+    getItem("Account", "sub5", <AccountBoxOutlinedIcon />, [
       getItem("Profile", "user", <BadgeOutlinedIcon />),
     ]),
-    getItem("Accountant", "sub5", <UserOutlined />, [
+    getItem("Accountant", "sub6", <UserOutlined />, [
       getItem("Chart of Accounts", "chartofaccounts"),
     ]),
   ];
-  //config
-  const { Sider } = Layout;
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
 
   //click handler for selecting items
   const onClick = (e) => {
@@ -77,7 +77,7 @@ const SideBar = () => {
         mode="inline"
         theme="dark"
         onClick={onClick}
-        defaultSelectedKeys={["/"]}
+        defaultSelectedKeys={[location.pathname]}
         selectedKeys={[current]}
         style={{
           height: "100%",

@@ -1,15 +1,15 @@
 import axios from "axios";
-import { Get_aCCOUNT_GROUPS } from "../../../constants/base-url";
+import { GET_CHART_OF_ACCOUNTS } from "../../constants/base-url";
 
-export async function getAccountGroups(token) {
+export async function getAccounts(token) {
   try {
-    const response = await axios.get(Get_aCCOUNT_GROUPS, {
+    const response = await axios.get(GET_CHART_OF_ACCOUNTS, {
       headers: {
         "content-type": "application/json",
         authorization: `Bearer ${token}`,
       },
     });
-    return response.data;
+    return response;
   } catch (error) {
     return error;
   }
