@@ -11,10 +11,10 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import "./tableForm.scss";
 
 const EditableContext = React.createContext(null);
-const EditableRow = ({ index, ...props }) => {
+const EditableRow = ({ index, parentForm, ...props }) => {
   const [form] = Form.useForm();
   const onFinish = (values) => {
-    console.log("Received values of form:", values);
+    console.log("Received values of editable table form:", values);
   };
   return (
     <Form form={form} component={false} onFinish={onFinish}>
@@ -32,11 +32,13 @@ const EditableCell = ({
   record,
   handleSave,
   itemsList,
+  renderDropDown,
   ...restProps
 }) => {
   const [editing, setEditing] = useState(false);
   const inputRef = useRef(null);
   const form = useContext(EditableContext);
+
   useEffect(() => {
     if (editing) {
       inputRef.current.focus();
@@ -50,37 +52,33 @@ const EditableCell = ({
   };
   const save = async () => {
     try {
-      //does not work on custom select component that I made. "values" variable remains
-      // empty on Select component, but works on Input component.
       const values = await form.validateFields();
-      console.log("Save Method values : ", values);
-      console.log("Save method record : ", record);
+
       toggleEdit();
-      handleSave({
-        ...record,
-        ...values,
-      });
+      handleSave(
+        {
+          ...record,
+          ...values,
+        },
+        dataIndex
+      );
     } catch (errInfo) {
       console.log("Save failed:", errInfo);
     }
   };
   const selectSave = async () => {
     try {
-      //does not work on custom select component that I made. "values" variable remains
-      // empty on Select component, but works on Input component.
       const values = await form.validateFields();
-      console.log("Save Method values : ", values);
-      console.log("Save method record : ", record);
+      console.log("Save method values : ", values);
       toggleEdit();
-      console.log("form getfieldValue", form.getFieldValue("item"));
-      console.log("Object Layout : ", {
-        ...record,
-        ...values,
-      });
-      handleSave({
-        ...record,
-        ...values,
-      });
+
+      handleSave(
+        {
+          ...record,
+          ...values,
+        },
+        dataIndex
+      );
     } catch (errInfo) {
       console.log("Save failed:", errInfo);
     }
@@ -100,7 +98,7 @@ const EditableCell = ({
           },
         ]}
       >
-        {dataIndex === "quantity" ? (
+        {!renderDropDown ? (
           <Input ref={inputRef} onPressEnter={save} onBlur={save} />
         ) : (
           <CustomSelect
@@ -127,9 +125,9 @@ const EditableCell = ({
   return <td {...restProps}>{childNode}</td>;
 };
 
-const TableForm = ({ tableColumns, data, itemsList }) => {
+const TableForm = ({ tableColumns, data, itemsList, onChange, parentForm }) => {
   const [dataSource, setDataSource] = useState([data]);
-  console.log("Table Form dataSource", dataSource);
+
   const columnDeleteButton = {
     title: "operation",
     dataIndex: "operation",
@@ -176,26 +174,54 @@ const TableForm = ({ tableColumns, data, itemsList }) => {
     setCount(count + 1);
   };
 
-  const handleSave = (row) => {
-    const newData = [...dataSource];
-    const index = newData.findIndex((item) => row.key === item.key);
+  const handleSave = (row, dataIndex) => {
+    console.log(dataIndex);
+    const newData = JSON.parse(JSON.stringify(dataSource));
+    console.log("value : ", newData);
+    // const newData = [...dataSource];
+
+    const index = newData.findIndex((item) => {
+      return row.key === item.key;
+    });
     const item = newData[index];
-    console.log(
-      "handleSave newData : ",
+    if (dataIndex === "item") {
+      const newItem = row.item;
+      console.log("item New : ", newItem);
+      let quantity = parseFloat(row.quantity).toFixed(2);
+      let rate = parseFloat(newItem.item_SalePrice).toFixed(2);
+      const amount = parseFloat(quantity * rate).toFixed(2);
+      row = JSON.parse(JSON.stringify({ ...row, quantity, rate, amount }));
+      console.log("Row New : ", row);
+
       newData.splice(index, 1, {
         ...item,
         ...row,
-      })
-    );
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
-    });
+      });
+    } else if (dataIndex !== "item") {
+      let quantity = parseFloat(row.quantity).toFixed(2);
+      let rate = parseFloat(row.rate).toFixed(2);
+      const amount = parseFloat(quantity * rate).toFixed(2);
+      row = JSON.parse(JSON.stringify({ ...row, quantity, rate, amount }));
+      console.log("Row New : ", row);
+
+      newData.splice(index, 1, {
+        ...item,
+        ...row,
+      });
+    } else {
+      newData.splice(index, 1, {
+        ...item,
+        ...row,
+      });
+      console.log(newData);
+    }
+    console.log(newData);
     setDataSource(newData);
+    //onChange(newData);
   };
   const components = {
     body: {
-      row: EditableRow,
+      row: (props) => <EditableRow parentForm={parentForm} {...props} />,
       cell: EditableCell,
     },
   };
@@ -211,6 +237,7 @@ const TableForm = ({ tableColumns, data, itemsList }) => {
         dataIndex: col.dataIndex,
         title: col.title,
         itemsList: itemsList,
+        renderDropDown: col.renderDropDown,
         handleSave,
       }),
     };
@@ -219,6 +246,7 @@ const TableForm = ({ tableColumns, data, itemsList }) => {
   return (
     <div>
       <Table
+        name={"lineItems"}
         pagination={false}
         components={components}
         rowClassName={() => "editable-row"}

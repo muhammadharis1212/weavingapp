@@ -56,13 +56,15 @@ const NewBillView = () => {
       },
       width: "30%",
       editable: true,
+      renderDropDown: true,
     },
     {
       title: "Account",
       dataIndex: "account",
-      render: ({ title }) => <div>{`${title}`}</div>,
+      render: ({ title }) => (title ? <div>{`${title}`}</div> : <div></div>),
       width: "25%",
       editable: true,
+      renderDropDown: true,
     },
     {
       title: "Quantity",
@@ -85,8 +87,8 @@ const NewBillView = () => {
   //Data format for table
   const data = {
     key: 0,
-    item: "",
-    account: 0,
+    item: {},
+    account: {},
     quantity: 1,
     rate: 0,
     amount: 0,
@@ -102,6 +104,7 @@ const NewBillView = () => {
   //Form Methods
   const onFinish = (values) => {
     console.log("Received values of form:", values);
+    console.log(form.getFieldsValue());
   };
   //Form submit method
 
@@ -138,6 +141,7 @@ const NewBillView = () => {
             <Divider />
             <Form.Item name={"itemsList"}>
               <TableForm
+                parentForm={form}
                 tableColumns={defaultColumns}
                 data={data}
                 itemsList={itemsList}

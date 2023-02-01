@@ -4,11 +4,10 @@ import { PlusOutlined } from "@ant-design/icons";
 
 const CustomSelect = forwardRef(({ ...props }, ref) => {
   const onChange = (value) => {
-    console.log("value in custom select : ", value);
-    // const newValue = props?.list.filter((obj) => value === obj.value);
-    // console.log("New Value : ", newValue[0]);
+    console.log("Custom Select Value : ", value);
+    const newValue = props?.list.filter((obj) => value.value === obj.value);
     //auto passed by Form.Item
-    props.onChange(value);
+    props.onChange(newValue[0]);
   };
   const onSearch = (value) => {
     console.log("search:", value);
