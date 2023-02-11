@@ -14,6 +14,8 @@ const ContentBody = ({ children }) => {
     // </div>
     <div
       style={{
+        paddingLeft: 20,
+        paddingTop: 20,
         overflowY: "auto",
         height: "100%",
         marginBottom: 0,

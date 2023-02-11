@@ -9,15 +9,15 @@ const initialState = {
 };
 export const getChartAccounts = createAsyncThunk(
   "chartofaccounts/getChartAccounts",
-  async (token) => {
-    const res = await getAccounts(token);
+  async (authToken) => {
+    const res = await getAccounts(authToken);
     return res.data;
   }
 );
 export const createChartAccount = createAsyncThunk(
   "chartofaccounts/createChartAccounts",
-  async (token, account) => {
-    const res = await postAccount(token, account);
+  async (authToken, account) => {
+    const res = await postAccount(authToken, account);
     return res.data;
   }
 );

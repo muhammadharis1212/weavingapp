@@ -3,12 +3,12 @@ import { useSelector } from "react-redux";
 import { Select, Button, Divider } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
-const UnitListView = ({ setOpen }) => {
+const UnitListView = ({ ...props }) => {
   const unit = useSelector((state) => state.itemUnits);
   const { units } = unit;
 
   const onChange = (value) => {
-    console.log(`selected ${value}`);
+    props.onChange(value.label);
   };
   const onSearch = (value) => {
     console.log("search:", value);
@@ -19,11 +19,13 @@ const UnitListView = ({ setOpen }) => {
   });
   return (
     <Select
+      labelInValue
       style={{
         width: 130,
       }}
+      getPopupContainer={(trigger) => trigger.parentNode}
       showSearch
-      placeholder="Select unit"
+      placeholder="Select Unit"
       optionFilterProp="children"
       onChange={onChange}
       onSearch={onSearch}
@@ -42,7 +44,7 @@ const UnitListView = ({ setOpen }) => {
           <Button
             type="text"
             icon={<PlusOutlined />}
-            onClick={() => setOpen((prev) => !prev)}
+            onClick={() => props.setOpen((prev) => !prev)}
             style={{
               width: "100%",
             }}

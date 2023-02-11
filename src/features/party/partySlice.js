@@ -54,7 +54,6 @@ export const partySlice = createSlice({
       state.isLoading = false;
       state.parties = [action.payload];
       state.error = "";
-      console.log("partySlice : ", state.parties);
     });
     builder.addCase(fetchParty.rejected, (state, action) => {
       state.isLoading = false;

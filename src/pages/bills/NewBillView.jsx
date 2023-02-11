@@ -7,6 +7,7 @@ import {
   Button,
   Table,
   Popconfirm,
+  DatePicker,
 } from "antd";
 import React, {
   useRef,
@@ -25,8 +26,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchItems } from "../../features/items/itemsSlice";
 import { AuthContext } from "../../context/AuthContext";
 import { fetchSuppliers } from "../../features/suppliers/suppliersSlice";
+import { newBill } from "../../features/bills/billsSlice";
+import moment from "moment/moment";
+import { useNavigate } from "react-router-dom";
 
 const NewBillView = () => {
+  const navigate = useNavigate();
   const { authToken } = useContext(AuthContext);
   const suppliers = useSelector((state) => state.suppliers.suppliers);
   const items = useSelector((state) => state.items.items);
@@ -89,9 +94,9 @@ const NewBillView = () => {
     key: 0,
     item: {},
     account: {},
-    quantity: 1,
-    rate: 0,
-    amount: 0,
+    quantity: "1.00",
+    rate: "0.00",
+    amount: "0.00",
   };
   //list for items to be displayed on custom select component
   const itemsList = items?.map((item) => ({
@@ -101,45 +106,119 @@ const NewBillView = () => {
     title: item.item_name,
   }));
 
-  //Form Methods
-  const onFinish = (values) => {
-    console.log("Received values of form:", values);
-    console.log(form.getFieldsValue());
+  //Form Method
+  const onFinish = (fieldsValue) => {
+    console.log("Received values of form:", fieldsValue);
+    //does not contain prototype chain properties of the original object which is fieldsValue
+    //therefore cloneObject["billDate"].format() is not available on cloned Object
+    const clonedObject = structuredClone(fieldsValue);
+    const bill = {
+      ...clonedObject,
+      status: "Open",
+      supplierId: fieldsValue.supplier?.id,
+      billDate: fieldsValue["billDate"].toISOString(),
+      dueDate: fieldsValue["billDueDate"]?.format("YYYY-MM-DD"),
+    };
+    console.log("Bill : ", bill);
+    dispatch(newBill({ authToken, bill }));
   };
-  //Form submit method
+  //Date Change Handler
+  const onDateChange = (date, dateString) => {
+    console.log(date, dateString);
+    console.log(moment(date).format("YYYY-MM-DD"));
+    const newDate = moment(date).format("YYYY-MM-DD");
+    form.setFieldsValue({ billDate: newDate });
+  };
+  const setBillDateField = (date) => {
+    form.setFieldsValue({ billDate: moment(date).format("YYYY-MM-DD") });
+  };
+  const saveAsDraftHandler = () => {
+    form.submit();
+  };
+  const onCancelhandler = () => {
+    navigate(-1);
+  };
 
   return (
     <ContentLayout>
-      <ContentHeader title={"New Bill"}> </ContentHeader>
+      <ContentHeader title={"New Bill"}></ContentHeader>
+
       <Divider style={{ margin: 0 }} />
+
       <ContentBody>
         <div>
-          <Form form={form} onFinish={onFinish}>
+          <Form
+            labelCol={{ span: 5 }}
+            labelAlign="left"
+            form={form}
+            onFinish={onFinish}
+          >
             <Form.Item
-              name="supplierId"
+              wrapperCol={{ span: 8 }}
+              name="supplier"
               label="Vendor Name"
               required
               style={{ background: token.colorFillAlter, padding: "30px 0px" }}
+              // rules={[
+              //   {
+              //     required: true,
+              //     message: "Required",
+              //   },
+              // ]}
             >
               <CustomSelect list={suppliersList} />
             </Form.Item>
-            <Form.Item name={"billNo"} label="Bill#" required>
+            <Form.Item
+              name={"billNo"}
+              label="Bill#"
+              required
+              wrapperCol={{ span: 8 }}
+              // rules={[
+              //   {
+              //     required: true,
+              //     message: "Required",
+              //   },
+              // ]}
+            >
               <Input placeholder="Bill No" />
             </Form.Item>
-            <Form.Item name={"wareHouseName"} label="Warehouse Name" required>
+            <Form.Item
+              wrapperCol={{ span: 8 }}
+              name={"wareHouseName"}
+              label="Warehouse Name"
+              required
+            >
               <Input placeholder="Warehouse Name" />
             </Form.Item>
-            <Form.Item name={"billDate"} label="Bill Date" required>
-              <Input placeholder="Date when bill issued" />
+            <Form.Item
+              wrapperCol={{ span: 4 }}
+              name={"billDate"}
+              label="Bill Date"
+              rules={[
+                {
+                  required: true,
+                  message: "Required",
+                },
+              ]}
+            >
+              <DatePicker picker="date" />
             </Form.Item>
-            <Form.Item name={"dueDate"} label="Due Date">
-              <Input placeholder="Due Date" />
+            <Form.Item
+              wrapperCol={{ span: 4 }}
+              name={"billDueDate"}
+              label="Due Date"
+            >
+              <DatePicker picker="date" />
             </Form.Item>
-            <Form.Item name={"paymentTerms"} label="Payment Terms">
+            <Form.Item
+              wrapperCol={{ span: 4 }}
+              name={"paymentTerms"}
+              label="Payment Terms"
+            >
               <Input placeholder="Payment Terms" />
             </Form.Item>
             <Divider />
-            <Form.Item name={"itemsList"}>
+            <Form.Item name={"billItems"}>
               <TableForm
                 parentForm={form}
                 tableColumns={defaultColumns}
@@ -147,12 +226,35 @@ const NewBillView = () => {
                 itemsList={itemsList}
               />
             </Form.Item>
-
+            <div
+              style={{
+                marginLeft: "auto",
+                marginTop: -20,
+                width: "50%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-end",
+                padding: 20,
+                background: token.colorFillAlter,
+                borderRadius: 10,
+              }}
+            >
+              <Form.Item>
+                <Input type="number" placeholder="Discount" />
+              </Form.Item>
+              <Form.Item>
+                <Input type="number" placeholder="Adjustments" />
+              </Form.Item>
+            </div>
             <Divider />
             <Form.Item>
+              <Button htmlType="submit" onClick={saveAsDraftHandler}>
+                Save as Draft
+              </Button>
               <Button type="primary" htmlType="submit">
                 Save
               </Button>
+              <Button onClick={onCancelhandler}>Cancel</Button>
             </Form.Item>
           </Form>
         </div>

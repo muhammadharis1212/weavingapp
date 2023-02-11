@@ -67,7 +67,7 @@ const CreatePartyView = () => {
         return;
       case "Both":
         form.setFieldsValue({
-          note: "Both",
+          role: "Both",
         });
         break;
       default:
@@ -115,7 +115,16 @@ const CreatePartyView = () => {
           }}
         >
           <div className="item--info">
-            <Form.Item label="Type" name={"type"}>
+            <Form.Item
+              label="Type"
+              name={"type"}
+              rules={[
+                {
+                  required: true,
+                  message: "Required",
+                },
+              ]}
+            >
               <Radio.Group
                 options={options}
                 onChange={radioValueChange}
@@ -140,7 +149,15 @@ const CreatePartyView = () => {
                     <Option value="Dr.">Dr.</Option>
                   </Select>
                 </Form.Item>
-                <Form.Item name={"firstName"}>
+                <Form.Item
+                  name={"firstName"}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Required",
+                    },
+                  ]}
+                >
                   <Input placeholder="First Name" />
                 </Form.Item>
                 <Form.Item name={"lastName"}>

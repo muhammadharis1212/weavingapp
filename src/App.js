@@ -20,6 +20,8 @@ import CreateCustomerView from "./pages/customers/CreateCustomerView";
 import SupplierView from "./pages/suppliers/SupplierView";
 import NewBillView from "./pages/bills/NewBillView";
 import TableForm from "./components/tableform/TableForm";
+import Bills from "./pages/bills/Bills";
+import BillView from "./pages/bills/BillView";
 const { Header, Sider, Content } = Layout;
 
 function App() {
@@ -71,8 +73,6 @@ function App() {
           </Header>
           <Content
             style={{
-              paddingLeft: 20,
-              paddingRight: 20,
               paddingTop: 10,
               background: colorBgContainer,
               height: "90vh",
@@ -103,7 +103,9 @@ function App() {
         <Route path="suppliers" element={<Suppliers />} />
         <Route path="suppliers/new" element={<CreateSupplier />} />
         <Route path="suppliers/:id" element={<SupplierView />} />
+        <Route path="bills" element={<Bills />} />
         <Route path="bills/new" element={<NewBillView />} />
+        <Route path="bills/:id" element={<BillView />} />
         <Route path="customers/new" element={<CreateCustomerView />} />
         <Route path="/auth/login" element={<Login />} />
         <Route path="tableform" element={<TableForm />} />

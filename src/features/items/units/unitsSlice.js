@@ -10,8 +10,8 @@ const initialState = {
 };
 export const getUnits = createAsyncThunk(
   "itemUnits/getUnits",
-  async (token) => {
-    const res = await getAllUnits(token);
+  async (authToken) => {
+    const res = await getAllUnits(authToken);
     return res.data;
   }
 );

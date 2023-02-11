@@ -99,7 +99,12 @@ const EditableCell = ({
         ]}
       >
         {!renderDropDown ? (
-          <Input ref={inputRef} onPressEnter={save} onBlur={save} />
+          <Input
+            type="number"
+            ref={inputRef}
+            onPressEnter={save}
+            onBlur={save}
+          />
         ) : (
           <CustomSelect
             list={itemsList}
@@ -166,9 +171,9 @@ const TableForm = ({ tableColumns, data, itemsList, onChange, parentForm }) => {
       key: count,
       item: "",
       account: "",
-      quantity: 1,
-      rate: 0,
-      amount: 0,
+      quantity: "1.00",
+      rate: "0.00",
+      amount: "0.00",
     };
     setDataSource([...dataSource, newData]);
     setCount(count + 1);
@@ -184,12 +189,13 @@ const TableForm = ({ tableColumns, data, itemsList, onChange, parentForm }) => {
       return row.key === item.key;
     });
     const item = newData[index];
+    row.itemId = row.item.item_id;
     if (dataIndex === "item") {
       const newItem = row.item;
       console.log("item New : ", newItem);
-      let quantity = parseFloat(row.quantity).toFixed(2);
-      let rate = parseFloat(newItem.item_SalePrice).toFixed(2);
-      const amount = parseFloat(quantity * rate).toFixed(2);
+      let quantity = parseFloat(parseFloat(row.quantity).toFixed(2));
+      let rate = parseFloat(parseFloat(newItem.item_SalePrice).toFixed(2));
+      const amount = parseFloat(parseFloat(quantity * rate).toFixed(2));
       row = JSON.parse(JSON.stringify({ ...row, quantity, rate, amount }));
       console.log("Row New : ", row);
 
@@ -198,9 +204,9 @@ const TableForm = ({ tableColumns, data, itemsList, onChange, parentForm }) => {
         ...row,
       });
     } else if (dataIndex !== "item") {
-      let quantity = parseFloat(row.quantity).toFixed(2);
-      let rate = parseFloat(row.rate).toFixed(2);
-      const amount = parseFloat(quantity * rate).toFixed(2);
+      let quantity = parseFloat(parseFloat(row.quantity).toFixed(2));
+      let rate = parseFloat(parseFloat(row.rate).toFixed(2));
+      const amount = parseFloat(parseFloat(quantity * rate).toFixed(2));
       row = JSON.parse(JSON.stringify({ ...row, quantity, rate, amount }));
       console.log("Row New : ", row);
 
@@ -209,6 +215,10 @@ const TableForm = ({ tableColumns, data, itemsList, onChange, parentForm }) => {
         ...row,
       });
     } else {
+      let quantity = parseFloat(parseFloat(row.quantity).toFixed(2));
+      let rate = parseFloat(parseFloat(row.rate).toFixed(2));
+      const amount = parseFloat(parseFloat(row.amount).toFixed(2));
+      row = JSON.parse(JSON.stringify({ ...row, quantity, rate, amount }));
       newData.splice(index, 1, {
         ...item,
         ...row,
@@ -217,7 +227,7 @@ const TableForm = ({ tableColumns, data, itemsList, onChange, parentForm }) => {
     }
     console.log(newData);
     setDataSource(newData);
-    //onChange(newData);
+    onChange(newData);
   };
   const components = {
     body: {

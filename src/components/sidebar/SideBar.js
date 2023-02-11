@@ -16,7 +16,7 @@ import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
 import AccountBoxOutlinedIcon from "@mui/icons-material/AccountBoxOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import "./sideBar.scss";
-
+import { createSearchParams } from "react-router-dom";
 import { Menu } from "antd";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -65,7 +65,20 @@ const SideBar = () => {
   //click handler for selecting items
   const onClick = (e) => {
     setCurrent(e.key);
-    navigate(e.key);
+    switch (e.key) {
+      case "bills":
+        navigate({
+          pathname: "bills",
+          search: createSearchParams({
+            filter_by: "Status.All",
+            limit: "100",
+            offset: "0",
+          }).toString(),
+        });
+        break;
+      default:
+        navigate(e.key);
+    }
   };
   return (
     <div>
