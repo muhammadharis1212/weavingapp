@@ -8,6 +8,7 @@ const UnitListView = ({ ...props }) => {
   const { units } = unit;
 
   const onChange = (value) => {
+    console.log("Unit list : ", value);
     props.onChange(value.label);
   };
   const onSearch = (value) => {

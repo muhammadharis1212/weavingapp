@@ -4,7 +4,7 @@ import CreateAccountView from "./CreateAccountView";
 import { AuthContext } from "../../context/AuthContext";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { getChartAccounts } from "../../features/chartofaccounts/chartOfAccountsSlice";
+import { fetchChartAccounts } from "../../features/chartofaccounts/chartOfAccountsSlice";
 
 const ChartOfAccounts = () => {
   const { token } = useContext(AuthContext);
@@ -15,7 +15,7 @@ const ChartOfAccounts = () => {
   });
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getChartAccounts(token));
+    dispatch(fetchChartAccounts(token));
     console.log("Fetch Data");
   }, [fetchFlag]);
 

@@ -11,6 +11,7 @@ const CreateUnitView = ({ open, setOpen, token }) => {
     setModalText("The modal will be closed after two seconds");
     await postUnit(token, text);
     setModalText("Success");
+    setOpen(false);
   };
   const handleCancel = () => {
     console.log("Clicked cancel button");

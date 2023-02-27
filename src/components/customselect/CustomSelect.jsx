@@ -11,6 +11,7 @@ const CustomSelect = forwardRef(({ ...props }, ref) => {
   };
   const onSearch = (value) => {
     console.log("search:", value);
+    console.log(props.list);
   };
 
   // const list = props.data?.map((unit) => {
@@ -52,7 +53,7 @@ const CustomSelect = forwardRef(({ ...props }, ref) => {
               width: "100%",
             }}
           >
-            Add Unit
+            Add New
           </Button>
         </>
       )}

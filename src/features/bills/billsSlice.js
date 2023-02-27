@@ -7,11 +7,11 @@ const initialState = {
   isLoading: false,
   bills: [],
   error: "",
+  page_context: {},
 };
 export const allBills = createAsyncThunk("bills/all", async (data) => {
-  const { authToken, filterBy, limit, offset } = data;
-  console.log(filterBy);
-  const res = await getAllBills(authToken, filterBy, limit, offset);
+  const { authToken, filterBy, perPage, page } = data;
+  const res = await getAllBills(authToken, filterBy, perPage, page);
   return res.data;
 });
 export const newBill = createAsyncThunk("bills/new", async (data) => {
@@ -34,12 +34,14 @@ export const billsSlice = createSlice({
     });
     builder.addCase(allBills.fulfilled, (state, action) => {
       state.isLoading = false;
-      state.bills = action.payload;
+      state.bills = action.payload.bills;
       state.error = "";
+      state.page_context = action.payload.page_context;
     });
     builder.addCase(allBills.rejected, (state, action) => {
       state.isLoading = false;
       state.bills = [];
+      state.page_context = {};
       state.error = action.error.message;
     });
 

@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { searchSuppliers } from "../../api/suppliers/searchSuppliers";
 import { allSuppliers } from "../../api/suppliers/suppliers";
 
 const initialState = {
@@ -8,9 +9,15 @@ const initialState = {
 };
 export const fetchSuppliers = createAsyncThunk(
   "suppliers/allSuppliers",
-  async (authToken) => {
-    const res = await allSuppliers(authToken);
-    return res?.data;
+  async (data) => {
+    const { authToken, searchParams } = data;
+    if (searchParams) {
+      const res = await searchSuppliers(authToken, searchParams);
+      return res?.data;
+    } else {
+      const res = await allSuppliers(authToken);
+      return res?.data;
+    }
   }
 );
 

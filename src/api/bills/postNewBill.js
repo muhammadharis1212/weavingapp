@@ -9,10 +9,9 @@ export async function postNewBill(authToken, bill) {
         authorization: `Bearer ${authToken}`,
       },
     });
-    console.log("Response : ", res);
     return res;
   } catch (error) {
-    console.error(error);
+    console.error("Axios Error : ", error.response);
     return error;
   }
 }

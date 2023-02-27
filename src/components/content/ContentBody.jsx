@@ -1,6 +1,12 @@
 import React from "react";
 
-const ContentBody = ({ children }) => {
+const ContentBody = ({
+  children,
+  paddingLeft,
+  paddingTop,
+  paddingBottom,
+  paddingRight,
+}) => {
   return (
     // <div
     //   style={{
@@ -14,8 +20,10 @@ const ContentBody = ({ children }) => {
     // </div>
     <div
       style={{
-        paddingLeft: 20,
-        paddingTop: 20,
+        paddingLeft,
+        paddingTop,
+        paddingBottom,
+        paddingRight,
         overflowY: "auto",
         height: "100%",
         marginBottom: 0,

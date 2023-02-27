@@ -25,7 +25,7 @@ const BillView = () => {
         title={bill?.id ? `${bill.id}` : "Bill ID"}
       ></ContentHeader>
       <Divider style={{ marginTop: 0 }} />
-      <ContentBody>
+      <ContentBody paddingLeft={20}>
         <div>{bill ? <BillTemplate bill={bill} /> : "Unable To Load Bill"}</div>
       </ContentBody>
     </ContentLayout>

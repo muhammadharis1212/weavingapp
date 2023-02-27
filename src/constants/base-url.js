@@ -5,6 +5,7 @@ export const AUTH_LOGIN = BASE_URL + "auth/login";
 export const PARTY = BASE_URL + "party";
 export const SUPPLIERS = BASE_URL + "suppliers";
 export const GET_ALL_Items = BASE_URL + "items";
+export const POST_ITEM = BASE_URL + "items/new";
 export const GET_ALL_Items_UNIT = BASE_URL + "items/uom/all";
 export const CREATE_ITEM_UNIT = BASE_URL + "items/uom/new";
 export const CREATE_CHART_OF_ACCOUNTS = BASE_URL + "chartofaccounts/create";

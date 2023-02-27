@@ -22,6 +22,8 @@ import NewBillView from "./pages/bills/NewBillView";
 import TableForm from "./components/tableform/TableForm";
 import Bills from "./pages/bills/Bills";
 import BillView from "./pages/bills/BillView";
+import ItemView from "./pages/items/ItemView";
+import EditItemView from "./pages/items/EditItemView";
 const { Header, Sider, Content } = Layout;
 
 function App() {
@@ -96,6 +98,8 @@ function App() {
 
         <Route path="items" element={<Items />}></Route>
         <Route path="items/new" element={<CreateItem />} />
+        <Route path="items/:id" element={<ItemView />} />
+        <Route path="items/:id/edit" element={<EditItemView />} />
         <Route path="chartofaccounts" element={<ChartOfAccounts />} />
         <Route path="party" element={<Party />} />
         <Route path="party/:id" element={<PartyView />} />

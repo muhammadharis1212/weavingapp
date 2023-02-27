@@ -22,7 +22,6 @@ import { AuthContext } from "../../context/AuthContext";
 
 const SideBar = () => {
   const location = useLocation();
-  console.log(location);
   const { company } = useContext(AuthContext);
   const navigate = useNavigate();
   const [current, setCurrent] = useState("/");
@@ -71,8 +70,8 @@ const SideBar = () => {
           pathname: "bills",
           search: createSearchParams({
             filter_by: "Status.All",
-            limit: "100",
-            offset: "0",
+            per_page: "50",
+            page: "1",
           }).toString(),
         });
         break;

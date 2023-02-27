@@ -7,7 +7,7 @@ const initialState = {
   chartOfAccounts: [],
   error: "",
 };
-export const getChartAccounts = createAsyncThunk(
+export const fetchChartAccounts = createAsyncThunk(
   "chartofaccounts/getChartAccounts",
   async (authToken) => {
     const res = await getAccounts(authToken);
@@ -25,15 +25,15 @@ export const chartOfAccountsSlice = createSlice({
   name: "chartofaccounts",
   initialState,
   extraReducers: (builder) => {
-    builder.addCase(getChartAccounts.pending, (state) => {
+    builder.addCase(fetchChartAccounts.pending, (state) => {
       state.isLoading = true;
     });
-    builder.addCase(getChartAccounts.fulfilled, (state, action) => {
+    builder.addCase(fetchChartAccounts.fulfilled, (state, action) => {
       state.isLoading = false;
       state.chartOfAccounts = action.payload;
       state.error = "";
     });
-    builder.addCase(getChartAccounts.rejected, (state, action) => {
+    builder.addCase(fetchChartAccounts.rejected, (state, action) => {
       state.isLoading = false;
       state.chartOfAccounts = [];
       state.error = action.error.message;

@@ -1,11 +1,11 @@
 import { BILLS } from "../../constants/base-url";
 import axios from "../axios";
 
-export async function getAllBills(authToken, filter_by, limit, offset) {
+export async function getAllBills(authToken, filter_by, per_page, page) {
   try {
     const res = await axios.get(
       BILLS,
-      { params: { filter_by, limit, offset } },
+      { params: { filter_by, per_page, page } },
       {
         headers: {
           "content-type": "application/json",

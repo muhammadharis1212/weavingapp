@@ -1,11 +1,13 @@
-import { Button, Form, Input, Popconfirm, Table } from "antd";
-import React, {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  forwardRef,
-} from "react";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Popconfirm,
+  Table,
+  theme,
+} from "antd";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import CustomSelect from "../../components/customselect/CustomSelect";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import "./tableForm.scss";
@@ -32,6 +34,7 @@ const EditableCell = ({
   record,
   handleSave,
   itemsList,
+  accountsList,
   renderDropDown,
   ...restProps
 }) => {
@@ -46,6 +49,7 @@ const EditableCell = ({
   }, [editing]);
   const toggleEdit = () => {
     setEditing(!editing);
+    console.log("In toggle Edit : ", { [dataIndex]: record[dataIndex] });
     form.setFieldsValue({
       [dataIndex]: record[dataIndex],
     });
@@ -53,25 +57,8 @@ const EditableCell = ({
   const save = async () => {
     try {
       const values = await form.validateFields();
-
+      console.log("validateFields : ", values);
       toggleEdit();
-      handleSave(
-        {
-          ...record,
-          ...values,
-        },
-        dataIndex
-      );
-    } catch (errInfo) {
-      console.log("Save failed:", errInfo);
-    }
-  };
-  const selectSave = async () => {
-    try {
-      const values = await form.validateFields();
-      console.log("Save method values : ", values);
-      toggleEdit();
-
       handleSave(
         {
           ...record,
@@ -89,6 +76,7 @@ const EditableCell = ({
       <Form.Item
         style={{
           margin: 0,
+          width: "100%",
         }}
         name={dataIndex}
         rules={[
@@ -99,17 +87,17 @@ const EditableCell = ({
         ]}
       >
         {!renderDropDown ? (
-          <Input
-            type="number"
+          <InputNumber
+            controls={false}
             ref={inputRef}
             onPressEnter={save}
             onBlur={save}
           />
         ) : (
           <CustomSelect
-            list={itemsList}
+            list={dataIndex === "item" ? itemsList : accountsList}
             ref={inputRef}
-            onBlur={selectSave}
+            onBlur={save}
             dataIndex={dataIndex}
             form={form}
           />
@@ -117,10 +105,7 @@ const EditableCell = ({
       </Form.Item>
     ) : (
       <div
-        className="editable-cell-value-wrap"
-        style={{
-          paddingRight: 24,
-        }}
+        className={`editable-cell-value-wrap editable-cell-value-wrap-${dataIndex}`}
         onClick={toggleEdit}
       >
         {children}
@@ -130,31 +115,65 @@ const EditableCell = ({
   return <td {...restProps}>{childNode}</td>;
 };
 
-const TableForm = ({ tableColumns, data, itemsList, onChange, parentForm }) => {
+const TableForm = ({
+  tableColumns,
+  data,
+  itemsList,
+  accountsList,
+  onChange,
+  parentForm,
+  setErrMsg,
+}) => {
+  const { token } = theme.useToken();
   const [dataSource, setDataSource] = useState([data]);
-
-  const columnDeleteButton = {
-    title: "operation",
-    dataIndex: "operation",
-    padding: "5px",
+  //for calculating total and subtotal to display on page
+  const [calTotal, setCalTotal] = useState({ subTotal: 0, total: 0 });
+  const columnAmountCell = {
+    title: "Amount",
+    dataIndex: "amount",
     margin: 0,
+    width: "15%",
+    render: (_, record) => {
+      return (
+        <div className="amount--column">
+          <strong>{`${record.amount}`}</strong>
+        </div>
+      );
+    },
+  };
+  const columnDeleteButton = {
+    title: "X",
+    dataIndex: "operation",
+    margin: 0,
+    width: 20,
     render: (_, record) =>
       dataSource.length >= 2 ? (
-        <Popconfirm
-          title="Sure to delete?"
-          onConfirm={() => handleDelete(record.key)}
-        >
-          <Button type="link">
-            <MinusCircleOutlined style={{ color: "red" }} />
-          </Button>
-        </Popconfirm>
+        <div className="operation--button">
+          <Popconfirm
+            title="Sure to delete?"
+            onConfirm={() => handleDelete(record.key)}
+          >
+            <Button
+              type="link"
+              icon={<MinusCircleOutlined style={{ color: "red" }} />}
+            ></Button>
+          </Popconfirm>
+        </div>
       ) : (
-        <div>
-          <MinusCircleOutlined disabled />
+        <div className="operation--button">
+          <Button
+            type="link"
+            disabled={true}
+            icon={<MinusCircleOutlined disabled />}
+          ></Button>
         </div>
       ),
   };
-  const defaultColumns = [...tableColumns, columnDeleteButton];
+  const defaultColumns = [
+    ...tableColumns,
+    columnAmountCell,
+    columnDeleteButton,
+  ];
   //row counter
   const [count, setCount] = useState(1);
   //table row data
@@ -169,45 +188,70 @@ const TableForm = ({ tableColumns, data, itemsList, onChange, parentForm }) => {
   const handleAdd = () => {
     const newData = {
       key: count,
-      item: "",
-      account: "",
-      quantity: "1.00",
-      rate: "0.00",
-      amount: "0.00",
+      item: null,
+      account: null,
+      quantity: 1,
+      rate: 0,
+      amount: 0,
     };
     setDataSource([...dataSource, newData]);
     setCount(count + 1);
   };
 
-  const handleSave = (row, dataIndex) => {
-    console.log(dataIndex);
-    const newData = JSON.parse(JSON.stringify(dataSource));
-    console.log("value : ", newData);
-    // const newData = [...dataSource];
+  const handleSave = (row, dataIndex, form) => {
+    console.log("Row in handleSave : ", row);
+    const newData = [...dataSource];
 
     const index = newData.findIndex((item) => {
       return row.key === item.key;
     });
     const item = newData[index];
-    row.itemId = row.item.item_id;
+
+    //if item is selected on the form
     if (dataIndex === "item") {
+      row.itemId = row.item.item_id;
       const newItem = row.item;
       console.log("item New : ", newItem);
-      let quantity = parseFloat(parseFloat(row.quantity).toFixed(2));
-      let rate = parseFloat(parseFloat(newItem.item_SalePrice).toFixed(2));
-      const amount = parseFloat(parseFloat(quantity * rate).toFixed(2));
-      row = JSON.parse(JSON.stringify({ ...row, quantity, rate, amount }));
-      console.log("Row New : ", row);
+      let quantity = parseFloat(row.quantity);
+      let rate = parseFloat(newItem.salePrice);
+      const amount = parseFloat(quantity * rate);
+      //check if account from the server matches the account in the item object
+      //then assign the account else account remain empty
+      if (
+        accountsList?.find(
+          (element) => element.id === newItem.purchaseAccountId
+        )
+      ) {
+        const account = accountsList.find(
+          (element) => element.id === newItem.purchaseAccountId
+        );
+        row = JSON.parse(
+          JSON.stringify({ ...row, account, quantity, rate, amount })
+        );
+      } else {
+        row = JSON.parse(
+          JSON.stringify({ ...row, account: null, quantity, rate, amount })
+        );
+      }
 
       newData.splice(index, 1, {
         ...item,
         ...row,
       });
-    } else if (dataIndex !== "item") {
-      let quantity = parseFloat(parseFloat(row.quantity).toFixed(2));
-      let rate = parseFloat(parseFloat(row.rate).toFixed(2));
-      const amount = parseFloat(parseFloat(quantity * rate).toFixed(2));
-      row = JSON.parse(JSON.stringify({ ...row, quantity, rate, amount }));
+    } else if (dataIndex === "account") {
+      console.log("In elseIf statement where dataIndex is account");
+      let quantity = parseFloat(row.quantity);
+      let rate = parseFloat(row.rate);
+      const amount = parseFloat(quantity * rate);
+      row = JSON.parse(
+        JSON.stringify({
+          ...row,
+          quantity,
+          rate,
+          amount,
+          accountId: row.account.id,
+        })
+      );
       console.log("Row New : ", row);
 
       newData.splice(index, 1, {
@@ -215,22 +259,65 @@ const TableForm = ({ tableColumns, data, itemsList, onChange, parentForm }) => {
         ...row,
       });
     } else {
-      let quantity = parseFloat(parseFloat(row.quantity).toFixed(2));
-      let rate = parseFloat(parseFloat(row.rate).toFixed(2));
-      const amount = parseFloat(parseFloat(row.amount).toFixed(2));
+      console.log("In else statement");
+      let quantity = parseFloat(row.quantity);
+      let rate = parseFloat(row.rate);
+      const amount = parseFloat(quantity * rate);
       row = JSON.parse(JSON.stringify({ ...row, quantity, rate, amount }));
       newData.splice(index, 1, {
         ...item,
         ...row,
       });
-      console.log(newData);
     }
-    console.log(newData);
+    console.log("newData : ", newData);
     setDataSource(newData);
-    onChange(newData);
+    //calculate subTotal and total
+    setCalTotal((prev) => {
+      const subTotal = newData.reduce((prev, curr) => {
+        return (prev += curr.amount);
+      }, 0);
+      console.log("SubTotal : ", subTotal);
+      return {
+        ...prev,
+        subTotal,
+        total: subTotal + parentForm.getFieldValue("adjustment"),
+      };
+    });
+
+    //send data to form which is needed
+    const resultArray = newData.map((element) => {
+      const { item, account, quantity, rate, amount } = element;
+      return {
+        itemId: item?.item_id,
+        accountId: account?.id,
+        quantity,
+        rate,
+        amount,
+      };
+    });
+    console.log("RESULT : ", resultArray);
+    onChange(resultArray);
+
+    validateFormData(resultArray, setErrMsg);
+  };
+  //set ErrMsg to display alert on NewBillView.jsx
+  const validateFormData = (resultArray, setErrMsg) => {
+    const errMsg = [];
+    resultArray.forEach((element) => {
+      if (!element.itemId) errMsg[0] = "Please Select Item";
+      if (!element.accountId) errMsg[1] = "Please Select Account";
+      if (!element.quantity || element.quantity <= 0)
+        errMsg[2] = "Quantity should be greater than 0";
+      if (!element.rate || element.rate <= 0)
+        errMsg[3] = "Rate should be greater than 0";
+    });
+
+    console.log(errMsg);
+    setErrMsg([...errMsg]);
   };
   const components = {
     body: {
+      //passed form object from upper component
       row: (props) => <EditableRow parentForm={parentForm} {...props} />,
       cell: EditableCell,
     },
@@ -247,14 +334,26 @@ const TableForm = ({ tableColumns, data, itemsList, onChange, parentForm }) => {
         dataIndex: col.dataIndex,
         title: col.title,
         itemsList: itemsList,
+        accountsList: accountsList,
         renderDropDown: col.renderDropDown,
         handleSave,
       }),
     };
   });
 
+  //Adjustment Handler
+  const adjustmentHandler = (value) => {
+    console.log("Value : ", value);
+    setCalTotal((prev) => {
+      return { ...prev, total: prev.subTotal + value };
+    });
+    //parentForm.setFieldValue({ adjustment: parseFloat(e.target.value) });
+  };
+
+  console.log("calc ; ", calTotal);
+
   return (
-    <div>
+    <div className="table--form">
       <Table
         name={"lineItems"}
         pagination={false}
@@ -264,16 +363,71 @@ const TableForm = ({ tableColumns, data, itemsList, onChange, parentForm }) => {
         dataSource={dataSource}
         columns={columns}
       />
-      <Button
-        onClick={handleAdd}
-        type="dashed"
-        style={{
-          marginTop: 10,
-          marginBottom: 16,
-        }}
-      >
-        <PlusOutlined /> Add Line Item
-      </Button>
+      <div className="table--bottom">
+        <Button
+          onClick={handleAdd}
+          type="dashed"
+          // style={{
+          //   marginTop: 30,
+          //   marginBottom: 20,
+          //   marginLeft: 20,
+          // }}
+        >
+          <PlusOutlined /> Add Line Item
+        </Button>
+        <div
+          className="card--container"
+          // style={{
+          //   marginLeft: "auto",
+          //   marginTop: -50,
+          //   width: "50%",
+          //   display: "flex",
+          //   flexDirection: "column",
+          //   justifyContent: "flex-end",
+          //   padding: 20,
+          //   background: token.colorFillAlter,
+          //   borderRadius: 10,
+          // }}
+        >
+          <div className="subtotal">
+            <p>Sub Total</p>
+            <p>{calTotal.subTotal}</p>
+          </div>
+          <table>
+            <tbody>
+              <tr>
+                <td>
+                  <p>Sub Total</p>
+                </td>
+                <td>
+                  <p>{calTotal.subTotal}</p>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <p>Adjustment</p>
+                </td>
+                <td>
+                  <Form.Item name={"adjustment"} initialValue={0}>
+                    <InputNumber
+                      placeholder="Adjustments"
+                      onChange={adjustmentHandler}
+                    />
+                  </Form.Item>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <p>Total</p>
+                </td>
+                <td>
+                  <p>{calTotal.total}</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

@@ -2,71 +2,80 @@ import {
   Divider,
   Form,
   Input,
-  Select,
   theme,
   Button,
-  Table,
-  Popconfirm,
+  Alert,
   DatePicker,
+  Space,
 } from "antd";
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useContext,
-  createContext,
-} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import ContentBody from "../../components/content/ContentBody";
 import ContentHeader from "../../components/content/ContentHeader";
 import ContentLayout from "../../components/layout/ContentLayout";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import CustomSelect from "../../components/customselect/CustomSelect";
 import TableForm from "../../components/tableform/TableForm";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchItems } from "../../features/items/itemsSlice";
 import { AuthContext } from "../../context/AuthContext";
-import { fetchSuppliers } from "../../features/suppliers/suppliersSlice";
 import { newBill } from "../../features/bills/billsSlice";
 import moment from "moment/moment";
 import { useNavigate } from "react-router-dom";
+import { fetchChartAccounts } from "../../features/chartofaccounts/chartOfAccountsSlice";
+import TextArea from "antd/es/input/TextArea";
+import DebounceSearchSelect from "./DebounceSearchSelect";
+import dayjs from "dayjs";
 
 const NewBillView = () => {
   const navigate = useNavigate();
   const { authToken } = useContext(AuthContext);
-  const suppliers = useSelector((state) => state.suppliers.suppliers);
+  const [errMsg, setErrMsg] = useState([]);
+  const [showAlert, setShowAlert] = useState(false);
   const items = useSelector((state) => state.items.items);
+  const accounts = useSelector(
+    (state) => state.chartOfAccounts.chartOfAccounts
+  );
   const dispatch = useDispatch();
   const { token } = theme.useToken();
   const [form] = Form.useForm();
+  //Data format for table
+  const data = {
+    key: 0,
+    item: null,
+    account: null,
+    quantity: 1,
+    rate: 0,
+    amount: 0,
+  };
+
   useEffect(() => {
     dispatch(fetchItems(authToken));
-    dispatch(fetchSuppliers(authToken));
+    dispatch(fetchChartAccounts(authToken));
   }, []);
-  //suppliers list for select component
-  const suppliersList = suppliers?.map((supplier) => ({
-    ...supplier,
-    value: supplier.id,
-    label: supplier?.lastName
-      ? `${supplier.firstName} ${supplier.lastName}`
-      : supplier.firstName,
-  }));
 
   //columns for table
   const defaultColumns = [
     {
       title: "Item",
       dataIndex: "item",
-      render: ({ title }) => {
-        return title ? <div>{`${title}`}</div> : <div></div>;
+      render: (props) => {
+        return props?.title ? (
+          <div>{`${props?.title}`}</div>
+        ) : (
+          <div>Select Item</div>
+        );
       },
-      width: "30%",
+
       editable: true,
       renderDropDown: true,
     },
     {
       title: "Account",
       dataIndex: "account",
-      render: ({ title }) => (title ? <div>{`${title}`}</div> : <div></div>),
+      render: (props) =>
+        props?.title ? (
+          <div>{`${props?.title}`}</div>
+        ) : (
+          <div>Select Account</div>
+        ),
       width: "25%",
       editable: true,
       renderDropDown: true,
@@ -74,30 +83,22 @@ const NewBillView = () => {
     {
       title: "Quantity",
       dataIndex: "quantity",
-      width: "10%",
+      width: "12%",
       editable: true,
     },
     {
       title: "Rate",
       dataIndex: "rate",
-      width: "10%",
+      width: "12%",
       editable: true,
     },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      width: "15%",
-    },
+    // {
+    //   title: "Amount",
+    //   dataIndex: "amount",
+    //   width: "15%",
+    // },
   ];
-  //Data format for table
-  const data = {
-    key: 0,
-    item: {},
-    account: {},
-    quantity: "1.00",
-    rate: "0.00",
-    amount: "0.00",
-  };
+
   //list for items to be displayed on custom select component
   const itemsList = items?.map((item) => ({
     ...item,
@@ -105,38 +106,59 @@ const NewBillView = () => {
     label: item.item_name,
     title: item.item_name,
   }));
-
+  const accountsList = accounts
+    ?.filter((account) => account.group.rootType.name === "Expenses")
+    .map((account) => ({
+      ...account,
+      value: account.id,
+      label: account.name,
+      title: account.name,
+    }));
   //Form Method
-  const onFinish = (fieldsValue) => {
-    console.log("Received values of form:", fieldsValue);
-    //does not contain prototype chain properties of the original object which is fieldsValue
+  const onFinish = (values) => {
+    console.log("Received values of form:", values);
+    //does not contain prototype chain properties of the original object which is" values"
     //therefore cloneObject["billDate"].format() is not available on cloned Object
-    const clonedObject = structuredClone(fieldsValue);
-    const bill = {
-      ...clonedObject,
-      status: "Open",
-      supplierId: fieldsValue.supplier?.id,
-      billDate: fieldsValue["billDate"].toISOString(),
-      dueDate: fieldsValue["billDueDate"]?.format("YYYY-MM-DD"),
-    };
-    console.log("Bill : ", bill);
-    dispatch(newBill({ authToken, bill }));
+    const fieldsValue = structuredClone(values);
+    console.log("fieldsValue : ", fieldsValue);
+    //make date with 0 time value
+    const billDate = new Date(values.billDate.toISOString());
+    billDate.setUTCHours(0, 0, 0, 0);
+    fieldsValue.billDate = billDate.toISOString();
+
+    if (values.billDueDate) {
+      let billDueDate = new Date(values.billDueDate.toISOString());
+      billDueDate.setUTCHours(0, 0, 0, 0);
+      fieldsValue.billDueDate = billDueDate.toISOString();
+    }
+    //set the status of the Bill
+    fieldsValue.status = "Open";
+
+    if (errMsg.length > 0 || !fieldsValue.billItems) {
+      console.log("In if statement");
+      setShowAlert((prev) => true);
+    } else dispatch(newBill({ authToken, bill: fieldsValue }));
   };
+  console.log("errMsg : ", errMsg);
+  console.log("Show ALert : ", showAlert);
   //Date Change Handler
-  const onDateChange = (date, dateString) => {
-    console.log(date, dateString);
-    console.log(moment(date).format("YYYY-MM-DD"));
-    const newDate = moment(date).format("YYYY-MM-DD");
-    form.setFieldsValue({ billDate: newDate });
+  const onBillDueDateChange = (date, dateString) => {};
+  const disabledDate = (current) => {
+    return current && current < dayjs().startOf("day");
   };
-  const setBillDateField = (date) => {
+  const onBillDateChanged = (date) => {
     form.setFieldsValue({ billDate: moment(date).format("YYYY-MM-DD") });
   };
   const saveAsDraftHandler = () => {
     form.submit();
   };
-  const onCancelhandler = () => {
+  const onCancelHandler = () => {
     navigate(-1);
+  };
+  const onClose = (e) => {
+    console.log(e, "I was closed.");
+    //setErrMsg(() => []);
+    setShowAlert(() => false);
   };
 
   return (
@@ -147,6 +169,29 @@ const NewBillView = () => {
 
       <ContentBody>
         <div>
+          {showAlert && (
+            <Alert
+              message={
+                errMsg.length ? (
+                  errMsg.map(
+                    (msg) =>
+                      msg && (
+                        <ul>
+                          <li>{msg}</li>
+                        </ul>
+                      )
+                  )
+                ) : (
+                  <ul>
+                    <li>Please fill the table form.</li>
+                  </ul>
+                )
+              }
+              type="error"
+              closable
+              onClose={onClose}
+            />
+          )}
           <Form
             labelCol={{ span: 5 }}
             labelAlign="left"
@@ -155,68 +200,76 @@ const NewBillView = () => {
           >
             <Form.Item
               wrapperCol={{ span: 8 }}
-              name="supplier"
-              label="Vendor Name"
+              name="supplierId"
+              label="Supplier Name"
               required
-              style={{ background: token.colorFillAlter, padding: "30px 0px" }}
-              // rules={[
-              //   {
-              //     required: true,
-              //     message: "Required",
-              //   },
-              // ]}
-            >
-              <CustomSelect list={suppliersList} />
-            </Form.Item>
-            <Form.Item
-              name={"billNo"}
-              label="Bill#"
-              required
-              wrapperCol={{ span: 8 }}
-              // rules={[
-              //   {
-              //     required: true,
-              //     message: "Required",
-              //   },
-              // ]}
-            >
-              <Input placeholder="Bill No" />
-            </Form.Item>
-            <Form.Item
-              wrapperCol={{ span: 8 }}
-              name={"wareHouseName"}
-              label="Warehouse Name"
-              required
-            >
-              <Input placeholder="Warehouse Name" />
-            </Form.Item>
-            <Form.Item
-              wrapperCol={{ span: 4 }}
-              name={"billDate"}
-              label="Bill Date"
+              style={{ background: token.colorFillAlter, padding: "30px 20px" }}
               rules={[
                 {
                   required: true,
-                  message: "Required",
+                  message: "Please select a supplier",
                 },
               ]}
             >
-              <DatePicker picker="date" />
+              <DebounceSearchSelect
+                placeholder={"Select or Search Supplier"}
+                authToken={authToken}
+              />
             </Form.Item>
-            <Form.Item
-              wrapperCol={{ span: 4 }}
-              name={"billDueDate"}
-              label="Due Date"
-            >
-              <DatePicker picker="date" />
-            </Form.Item>
-            <Form.Item
-              wrapperCol={{ span: 4 }}
-              name={"paymentTerms"}
-              label="Payment Terms"
-            >
-              <Input placeholder="Payment Terms" />
-            </Form.Item>
+            <div style={{ paddingLeft: 20 }}>
+              <Form.Item
+                name={"billNo"}
+                label="Bill#"
+                required
+                wrapperCol={{ span: 8 }}
+                rules={[
+                  {
+                    required: true,
+                    message: "Required",
+                  },
+                ]}
+              >
+                <Input placeholder="Bill No" />
+              </Form.Item>
+
+              <Form.Item
+                wrapperCol={{ span: 4 }}
+                name={"billDate"}
+                label="Bill Date"
+                rules={[
+                  {
+                    required: true,
+                    message: "Required",
+                  },
+                ]}
+              >
+                <DatePicker picker="date" />
+              </Form.Item>
+              <Form.Item
+                wrapperCol={{ span: 4 }}
+                name={"billDueDate"}
+                label="Due Date"
+                rules={[
+                  {
+                    required: true,
+                    message: "Required",
+                  },
+                ]}
+              >
+                <DatePicker
+                  onChange={onBillDueDateChange}
+                  disabledDate={disabledDate}
+                  picker="date"
+                />
+              </Form.Item>
+              {/* <Form.Item
+                wrapperCol={{ span: 4 }}
+                name={"paymentTerms"}
+                label="Payment Terms"
+              >
+                <Input placeholder="Payment Terms" />
+              </Form.Item> */}
+            </div>
             <Divider />
             <Form.Item name={"billItems"}>
               <TableForm
@@ -224,37 +277,35 @@ const NewBillView = () => {
                 tableColumns={defaultColumns}
                 data={data}
                 itemsList={itemsList}
+                accountsList={accountsList}
+                setErrMsg={setErrMsg}
               />
             </Form.Item>
             <div
               style={{
-                marginLeft: "auto",
-                marginTop: -20,
-                width: "50%",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-end",
-                padding: 20,
                 background: token.colorFillAlter,
-                borderRadius: 10,
+                padding: "30px 20px",
               }}
             >
-              <Form.Item>
-                <Input type="number" placeholder="Discount" />
+              <Form.Item name={"notes"} style={{ marginBottom: 0 }}>
+                <TextArea style={{ maxWidth: "50%" }} />
               </Form.Item>
-              <Form.Item>
-                <Input type="number" placeholder="Adjustments" />
-              </Form.Item>
+              <p style={{ margin: 0, fontSize: 10, paddingLeft: 3 }}>
+                It will not be shown in the pdf
+              </p>
             </div>
+
             <Divider />
-            <Form.Item>
-              <Button htmlType="submit" onClick={saveAsDraftHandler}>
-                Save as Draft
-              </Button>
-              <Button type="primary" htmlType="submit">
-                Save
-              </Button>
-              <Button onClick={onCancelhandler}>Cancel</Button>
+            <Form.Item style={{ marginLeft: 20 }}>
+              <Space>
+                <Button htmlType="submit" onClick={saveAsDraftHandler}>
+                  Save as Draft
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  Save as Open
+                </Button>
+                <Button onClick={onCancelHandler}>Cancel</Button>
+              </Space>
             </Form.Item>
           </Form>
         </div>
