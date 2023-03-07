@@ -70,8 +70,10 @@ const SideBar = () => {
           pathname: "bills",
           search: createSearchParams({
             filter_by: "Status.All",
-            per_page: "50",
+            per_page: "2",
             page: "1",
+            sort_column: "createdAt",
+            sort_order: "asc",
           }).toString(),
         });
         break;

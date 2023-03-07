@@ -198,7 +198,7 @@ const TableForm = ({
     setCount(count + 1);
   };
 
-  const handleSave = (row, dataIndex, form) => {
+  const handleSave = (row, dataIndex) => {
     console.log("Row in handleSave : ", row);
     const newData = [...dataSource];
 
@@ -377,55 +377,32 @@ const TableForm = ({
         </Button>
         <div
           className="card--container"
-          // style={{
-          //   marginLeft: "auto",
-          //   marginTop: -50,
-          //   width: "50%",
-          //   display: "flex",
-          //   flexDirection: "column",
-          //   justifyContent: "flex-end",
-          //   padding: 20,
-          //   background: token.colorFillAlter,
-          //   borderRadius: 10,
-          // }}
+          style={{ background: token.colorFillAlter }}
         >
           <div className="subtotal">
             <p>Sub Total</p>
             <p>{calTotal.subTotal}</p>
           </div>
-          <table>
-            <tbody>
-              <tr>
-                <td>
-                  <p>Sub Total</p>
-                </td>
-                <td>
-                  <p>{calTotal.subTotal}</p>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>Adjustment</p>
-                </td>
-                <td>
-                  <Form.Item name={"adjustment"} initialValue={0}>
-                    <InputNumber
-                      placeholder="Adjustments"
-                      onChange={adjustmentHandler}
-                    />
-                  </Form.Item>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>Total</p>
-                </td>
-                <td>
-                  <p>{calTotal.total}</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="adjustment">
+            <p>Adjustment</p>
+            <Form.Item
+              style={{ margin: 0, padding: 0 }}
+              name={"adjustment"}
+              initialValue={0}
+            >
+              <InputNumber
+                placeholder="Adjustments"
+                onChange={adjustmentHandler}
+              />
+            </Form.Item>
+            <p>{parentForm.getFieldValue("adjustment")}</p>
+          </div>
+          <div className="total">
+            <p>Total</p>
+            <p>
+              <strong>{calTotal.total}</strong>
+            </p>
+          </div>
         </div>
       </div>
     </div>

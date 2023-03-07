@@ -131,8 +131,6 @@ const NewBillView = () => {
       billDueDate.setUTCHours(0, 0, 0, 0);
       fieldsValue.billDueDate = billDueDate.toISOString();
     }
-    //set the status of the Bill
-    fieldsValue.status = "Open";
 
     if (errMsg.length > 0 || !fieldsValue.billItems) {
       console.log("In if statement");
@@ -142,14 +140,26 @@ const NewBillView = () => {
   console.log("errMsg : ", errMsg);
   console.log("Show ALert : ", showAlert);
   //Date Change Handler
-  const onBillDueDateChange = (date, dateString) => {};
+  const onBillDueDateChanged = (date, dateString) => {
+    console.log(date.toISOString());
+  };
   const disabledDate = (current) => {
-    return current && current < dayjs().startOf("day");
+    console.log("Current : ", current.toISOString());
+    const date = form.getFieldValue("billDate");
+    if (date) return date && current < dayjs(date);
+    else return current && current < dayjs().startOf("day");
   };
   const onBillDateChanged = (date) => {
-    form.setFieldsValue({ billDate: moment(date).format("YYYY-MM-DD") });
+    console.log("Bill date : ", date);
+    form.setFieldValue("billDueDate", date);
   };
-  const saveAsDraftHandler = () => {
+  const saveAsDraftHandler = (value) => {
+    console.log("Value : ", value);
+    form.setFieldValue("status", "DRAFT");
+    form.submit();
+  };
+  const saveAsOpenHandler = (e) => {
+    form.setFieldValue("status", "OPEN");
     form.submit();
   };
   const onCancelHandler = () => {
@@ -199,6 +209,12 @@ const NewBillView = () => {
             onFinish={onFinish}
           >
             <Form.Item
+              name="status"
+              style={{ margin: "-16px", marginRight: "0px", padding: 0 }}
+            >
+              <Input type="hidden" />
+            </Form.Item>
+            <Form.Item
               wrapperCol={{ span: 8 }}
               name="supplierId"
               label="Supplier Name"
@@ -221,7 +237,7 @@ const NewBillView = () => {
                 name={"billNo"}
                 label="Bill#"
                 required
-                wrapperCol={{ span: 8 }}
+                wrapperCol={{ span: 6 }}
                 rules={[
                   {
                     required: true,
@@ -233,7 +249,7 @@ const NewBillView = () => {
               </Form.Item>
 
               <Form.Item
-                wrapperCol={{ span: 4 }}
+                wrapperCol={{ span: 10 }}
                 name={"billDate"}
                 label="Bill Date"
                 rules={[
@@ -243,10 +259,10 @@ const NewBillView = () => {
                   },
                 ]}
               >
-                <DatePicker picker="date" />
+                <DatePicker picker="date" onChange={onBillDateChanged} />
               </Form.Item>
               <Form.Item
-                wrapperCol={{ span: 4 }}
+                wrapperCol={{ span: 10 }}
                 name={"billDueDate"}
                 label="Due Date"
                 rules={[
@@ -257,18 +273,11 @@ const NewBillView = () => {
                 ]}
               >
                 <DatePicker
-                  onChange={onBillDueDateChange}
+                  onChange={onBillDueDateChanged}
                   disabledDate={disabledDate}
                   picker="date"
                 />
               </Form.Item>
-              {/* <Form.Item
-                wrapperCol={{ span: 4 }}
-                name={"paymentTerms"}
-                label="Payment Terms"
-              >
-                <Input placeholder="Payment Terms" />
-              </Form.Item> */}
             </div>
             <Divider />
             <Form.Item name={"billItems"}>
@@ -287,6 +296,7 @@ const NewBillView = () => {
                 padding: "30px 20px",
               }}
             >
+              <div style={{ marginBottom: 5 }}>Notes</div>
               <Form.Item name={"notes"} style={{ marginBottom: 0 }}>
                 <TextArea style={{ maxWidth: "50%" }} />
               </Form.Item>
@@ -298,10 +308,8 @@ const NewBillView = () => {
             <Divider />
             <Form.Item style={{ marginLeft: 20 }}>
               <Space>
-                <Button htmlType="submit" onClick={saveAsDraftHandler}>
-                  Save as Draft
-                </Button>
-                <Button type="primary" htmlType="submit">
+                <Button onClick={saveAsDraftHandler}>Save as Draft</Button>
+                <Button onClick={saveAsOpenHandler} type="primary">
                   Save as Open
                 </Button>
                 <Button onClick={onCancelHandler}>Cancel</Button>
