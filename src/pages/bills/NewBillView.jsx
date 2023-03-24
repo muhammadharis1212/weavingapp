@@ -17,12 +17,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchItems } from "../../features/items/itemsSlice";
 import { AuthContext } from "../../context/AuthContext";
 import { newBill } from "../../features/bills/billsSlice";
-import moment from "moment/moment";
 import { useNavigate } from "react-router-dom";
 import { fetchChartAccounts } from "../../features/chartofaccounts/chartOfAccountsSlice";
 import TextArea from "antd/es/input/TextArea";
 import DebounceSearchSelect from "./DebounceSearchSelect";
 import dayjs from "dayjs";
+import { createSearchParams } from "react-router-dom";
+import { fetchSuppliers } from "../../features/suppliers/suppliersSlice";
 
 const NewBillView = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const NewBillView = () => {
   const accounts = useSelector(
     (state) => state.chartOfAccounts.chartOfAccounts
   );
+  const suppliers = useSelector((state) => state.suppliers);
   const dispatch = useDispatch();
   const { token } = theme.useToken();
   const [form] = Form.useForm();
@@ -49,6 +51,7 @@ const NewBillView = () => {
   useEffect(() => {
     dispatch(fetchItems(authToken));
     dispatch(fetchChartAccounts(authToken));
+    dispatch(fetchSuppliers(authToken));
   }, []);
 
   //columns for table
@@ -133,18 +136,34 @@ const NewBillView = () => {
     }
 
     if (errMsg.length > 0 || !fieldsValue.billItems) {
-      console.log("In if statement");
       setShowAlert((prev) => true);
     } else dispatch(newBill({ authToken, bill: fieldsValue }));
+    if (errMsg.length === 0) {
+      // navigate(`/bills`, {
+      //   state: { editStatus: "success" },
+      //   replace: true,
+      // });
+      navigate(
+        {
+          pathname: "/bills",
+          search: createSearchParams({
+            filter_by: "Status.All",
+            per_page: "2",
+            page: "1",
+            sort_column: "createdAt",
+            sort_order: "desc",
+          }).toString(),
+        },
+        { state: { editStatus: "success" }, replace: true }
+      );
+    }
   };
-  console.log("errMsg : ", errMsg);
-  console.log("Show ALert : ", showAlert);
+
   //Date Change Handler
   const onBillDueDateChanged = (date, dateString) => {
     console.log(date.toISOString());
   };
   const disabledDate = (current) => {
-    console.log("Current : ", current.toISOString());
     const date = form.getFieldValue("billDate");
     if (date) return date && current < dayjs(date);
     else return current && current < dayjs().startOf("day");
@@ -230,6 +249,16 @@ const NewBillView = () => {
               <DebounceSearchSelect
                 placeholder={"Select or Search Supplier"}
                 authToken={authToken}
+                options={(suppliers?.suppliers || []).map((d) => {
+                  const fullName = `${d?.firstName} ${
+                    d.lastName ? d?.lastName : ""
+                  }`;
+                  return {
+                    value: d.id,
+                    label: fullName,
+                  };
+                })}
+                isLoading={suppliers.isLoading}
               />
             </Form.Item>
             <div style={{ paddingLeft: 20 }}>

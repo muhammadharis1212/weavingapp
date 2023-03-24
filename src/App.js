@@ -24,6 +24,7 @@ import Bills from "./pages/bills/Bills";
 import BillView from "./pages/bills/BillView";
 import ItemView from "./pages/items/ItemView";
 import EditItemView from "./pages/items/EditItemView";
+import EditBill from "./pages/bills/EditBill";
 const { Header, Sider, Content } = Layout;
 
 function App() {
@@ -110,6 +111,7 @@ function App() {
         <Route path="bills" element={<Bills />} />
         <Route path="bills/new" element={<NewBillView />} />
         <Route path="bills/:id" element={<BillView />} />
+        <Route path="bills/:id/edit" element={<EditBill />} />
         <Route path="customers/new" element={<CreateCustomerView />} />
         <Route path="/auth/login" element={<Login />} />
         <Route path="tableform" element={<TableForm />} />

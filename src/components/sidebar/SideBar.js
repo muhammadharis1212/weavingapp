@@ -22,9 +22,11 @@ import { AuthContext } from "../../context/AuthContext";
 
 const SideBar = () => {
   const location = useLocation();
+  //console.log(location);
   const { company } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [current, setCurrent] = useState("/");
+  const [current, setCurrent] = useState(location.pathname);
+  const [openedSubMenu, setOpenedSubMenu] = useState();
   //Function to get SideBar Menu Items
   function getItem(label, key, icon, children, type) {
     return {
@@ -46,9 +48,9 @@ const SideBar = () => {
       getItem("Invoices", "3", <RequestQuoteOutlinedIcon />),
     ]),
 
-    getItem("Purchases", "sub3", <ShoppingBagOutlined />, [
+    getItem("Purchases", "purchases", <ShoppingBagOutlined />, [
       getItem("Suppliers", "suppliers", <StoreIcon />),
-      getItem("Bills", "bills", <ReceiptLongOutlinedIcon />),
+      getItem("Bills", "/bills", <ReceiptLongOutlinedIcon />),
     ]),
     getItem("Common", "sub4", <AccountBoxOutlinedIcon />, [
       getItem("Party", "party", <BadgeOutlinedIcon />),
@@ -63,9 +65,11 @@ const SideBar = () => {
 
   //click handler for selecting items
   const onClick = (e) => {
+    console.log(e);
     setCurrent(e.key);
     switch (e.key) {
-      case "bills":
+      case "/bills":
+        setOpenedSubMenu(() => "purchases");
         navigate({
           pathname: "bills",
           search: createSearchParams({
@@ -73,7 +77,19 @@ const SideBar = () => {
             per_page: "2",
             page: "1",
             sort_column: "createdAt",
-            sort_order: "asc",
+            sort_order: "desc",
+          }).toString(),
+        });
+        break;
+      case "items":
+        navigate({
+          pathname: "items",
+          search: createSearchParams({
+            filter_by: "Status.All",
+            per_page: "2",
+            page: "1",
+            sort_column: "createdAt",
+            sort_order: "desc",
           }).toString(),
         });
         break;

@@ -1,6 +1,7 @@
 import { Select, Spin } from "antd";
+import { Option } from "antd/es/mentions";
 import qs from "qs";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { searchSuppliers } from "../../api/suppliers/searchSuppliers";
 import { allSuppliers } from "../../api/suppliers/suppliers";
@@ -20,17 +21,20 @@ const fetch = (value, callback, authToken) => {
     });
     // const res = await searchSuppliers(authToken, value);
     // callback(() => res.data);
-    callback(fetchSuppliers({ authToken, searchParams: value }));
+    await callback(fetchSuppliers({ authToken, searchParams: currentValue }));
   };
-  timeout = setTimeout(fetchData, 300);
+  timeout = setTimeout(fetchData, 500);
 };
-const DebounceSearchSelect = (props) => {
-  const [data, setData] = useState([]);
+const DebounceSearchSelect = forwardRef(({ ...props }, ref) => {
+  const defaultOption = props?.defaultOption;
+  // const [data, setData] = useState([]);
   const [value, setValue] = useState();
-  const suppliers = useSelector((state) => state.suppliers);
+  //const suppliers = useSelector((state) => state.suppliers);
+  console.log("value : ", value);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(fetchSuppliers(props.authToken));
+    if (defaultOption?.value) setValue(defaultOption.value);
+    //dispatch(fetchSuppliers(props.authToken));
     // const fetchSuppliers = async (authToken) => {
     //   const res = await allSuppliers(authToken);
     //   setData((prev) => res?.data);
@@ -39,23 +43,25 @@ const DebounceSearchSelect = (props) => {
   }, []);
   const handleSearch = (newValue) => {
     if (newValue) {
-      console.log("newValue : ", newValue);
       //fetch(newValue, setData, props.authToken);
       fetch(newValue, dispatch, props.authToken);
     } else {
-      console.log("In else");
-      dispatch(fetchSuppliers(props.authToken));
+      //console.log("In else");
+      //dispatch(fetchSuppliers(props.authToken));
+      fetch("", dispatch, props.authToken);
     }
   };
   const handleChange = (newValue) => {
-    setValue(newValue);
-    props.onChange(newValue);
+    //console.log("handleChange", newValue);
+    setValue(() => newValue);
+    props?.onChange(newValue);
   };
   const handleClick = () => {
     console.log("CLicked");
   };
   return (
     <Select
+      ref={ref}
       showSearch
       value={value}
       placeholder={props.placeholder}
@@ -69,16 +75,11 @@ const DebounceSearchSelect = (props) => {
       onChange={handleChange}
       onClick={handleClick}
       notFoundContent={"Result Not Found"}
-      options={(suppliers.suppliers || []).map((d) => {
-        const fullName = `${d.firstName} ${d.lastName ? d.lastName : ""}`;
-        return {
-          value: d.id,
-          label: fullName,
-        };
-      })}
+      // suppliers.suppliers
+      options={props?.options || []}
       dropdownRender={(menu) => (
         <>
-          {suppliers.isLoading ? (
+          {props?.isLoading ? (
             <div>
               <Spin />
             </div>
@@ -87,8 +88,8 @@ const DebounceSearchSelect = (props) => {
           )}
         </>
       )}
-    />
+    ></Select>
   );
-};
+});
 
 export default DebounceSearchSelect;

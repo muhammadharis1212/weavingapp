@@ -8,28 +8,31 @@ import { allBills } from "../../features/bills/billsSlice";
 import { Button, Pagination, Spin } from "antd";
 import ContentLayout from "../../components/layout/ContentLayout";
 import { Divider, Empty, Table, theme, Dropdown, Space } from "antd";
-import {
-  PlusOutlined,
-  CaretUpFilled,
-  CaretDownFilled,
-} from "@ant-design/icons";
+import { PlusOutlined, DownOutlined } from "@ant-design/icons";
 import "./bills.scss";
+import SortButtons from "../../components/SortButtons";
 
 const Bills = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  //search params
+  const page = Number(searchParams.get("page")) || searchParams.set("page", 1);
+  const per_page =
+    Number(searchParams.get("per_page")) || searchParams.set("per_page", 50);
+  const filter_by = searchParams.get("filter_by");
+  const sort_column = searchParams.get("sort_column");
+  const sort_order = searchParams.get("sort_order");
+
+  //antd theme token
   const { token } = theme.useToken();
   const navigate = useNavigate();
-  let [searchParams, setSearchParams] = useSearchParams();
+
   const { authToken } = useContext(AuthContext);
   const data = useSelector((state) => state.bills);
   const { isLoading, bills, error, page_context } = data;
   const dispatch = useDispatch();
-  const [selectedItem, setSelectedItem] = useState("createdAt");
-  const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
-  const page = Number(searchParams.get("page"));
-  const per_page = Number(searchParams.get("per_page"));
-  const filter_by = searchParams.get("filter_by");
-  const sort_column = searchParams.get("sort_column");
-  const sort_order = searchParams.get("sort_order");
+  const [selectedItem, setSelectedItem] = useState(sort_column);
+  const [selectedStatusItem, setSelectedStatusItem] = useState(filter_by);
+
   const [tableParams, setTableParams] = useState({
     pagination: {
       current: Number(searchParams.get("page")),
@@ -162,23 +165,11 @@ const Bills = () => {
     },
   ];
 
-  const components = {
-    body: {
-      row: (props) => (
-        <tr
-          onClick={(e) => {
-            console.log("props : ", props);
-          }}
-          children={props.children}
-        />
-      ),
-    },
-  };
   const items = [
     {
       key: "1",
       type: "group",
-      label: "Sort By",
+      label: "Sort by",
       children: [
         {
           label: (
@@ -189,82 +180,147 @@ const Bills = () => {
                 columnGap: 10,
               }}
             >
-              <span>Created Time</span>
+              <span style={{ paddingRight: 60 }}>Creation Time</span>
               {selectedItem === "createdAt" && (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    marginLeft: "auto",
-                  }}
-                >
-                  <CaretUpFilled
-                    style={{
-                      marginBottom: "-4px",
-                      color:
-                        sort_order === "asc"
-                          ? token.colorPrimary
-                          : token.colorBgContainer,
-                    }}
-                    onClick={(e) => {
-                      console.log("Icon clicked : ", e.target);
-                      e.stopPropagation();
-                      //searchParams.set("sort_order", "desc");
-                      setSearchParams({
-                        filter_by: filter_by,
-                        per_page: per_page,
-                        page: page,
-                        sort_column: sort_column,
-                        sort_order: "asc",
-                      });
-                    }}
-                  />
-                  <CaretDownFilled
-                    style={{
-                      color:
-                        sort_order === "desc"
-                          ? token.colorPrimary
-                          : token.colorBgContainer,
-                    }}
-                    onClick={(e) => {
-                      console.log("Icon clicked : ", e);
-                      e.stopPropagation();
-                      //searchParams.set("sort_order", "desc");
-                      setSearchParams({
-                        filter_by: filter_by,
-                        per_page: per_page,
-                        page: page,
-                        sort_column: sort_column,
-                        sort_order: "desc",
-                      });
-                    }}
-                  />
-                </div>
+                <SortButtons
+                  filter_by={filter_by}
+                  per_page={per_page}
+                  page={page}
+                  sort_column={sort_column}
+                  sort_order={sort_order}
+                  setSearchParams={setSearchParams}
+                  token={token}
+                />
               )}
             </div>
           ),
           key: "createdAt",
         },
         {
-          label: "Bill Date",
+          label: (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                columnGap: 10,
+              }}
+            >
+              <span>Bill Date</span>
+              {selectedItem === "billDate" && (
+                <SortButtons
+                  filter_by={filter_by}
+                  per_page={per_page}
+                  page={page}
+                  sort_column={sort_column}
+                  sort_order={sort_order}
+                  setSearchParams={setSearchParams}
+                  token={token}
+                />
+              )}
+            </div>
+          ),
           key: "billDate",
         },
 
         {
-          label: "Bill#",
+          label: (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                columnGap: 10,
+              }}
+            >
+              <span>Bill#</span>
+              {selectedItem === "billNo" && (
+                <SortButtons
+                  filter_by={filter_by}
+                  per_page={per_page}
+                  page={page}
+                  sort_column={sort_column}
+                  sort_order={sort_order}
+                  setSearchParams={setSearchParams}
+                  token={token}
+                />
+              )}
+            </div>
+          ),
           key: "billNo",
         },
         {
-          label: "Supplier Name",
+          label: (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                columnGap: 10,
+              }}
+            >
+              <span>Name</span>
+              {selectedItem === "Supplier" && (
+                <SortButtons
+                  filter_by={filter_by}
+                  per_page={per_page}
+                  page={page}
+                  sort_column={sort_column}
+                  sort_order={sort_order}
+                  setSearchParams={setSearchParams}
+                  token={token}
+                />
+              )}
+            </div>
+          ),
           key: "Supplier",
         },
         {
-          label: "Due Date",
-          key: "5",
+          label: (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                columnGap: 10,
+              }}
+            >
+              <span>Due Date</span>
+              {selectedItem === "billDueDate" && (
+                <SortButtons
+                  filter_by={filter_by}
+                  per_page={per_page}
+                  page={page}
+                  sort_column={sort_column}
+                  sort_order={sort_order}
+                  setSearchParams={setSearchParams}
+                  token={token}
+                />
+              )}
+            </div>
+          ),
+          key: "billDueDate",
         },
         {
-          label: "Amount",
-          key: "6",
+          label: (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                columnGap: 10,
+              }}
+            >
+              <span>Amount</span>
+              {selectedItem === "outStandingAmount" && (
+                <SortButtons
+                  filter_by={filter_by}
+                  per_page={per_page}
+                  page={page}
+                  sort_column={sort_column}
+                  sort_order={sort_order}
+                  setSearchParams={setSearchParams}
+                  token={token}
+                />
+              )}
+            </div>
+          ),
+          key: "outStandingAmount",
         },
       ],
     },
@@ -286,14 +342,70 @@ const Bills = () => {
     selectedKeys: selectedItem,
     onClick: onMenuClick,
   };
-
+  const statusItems = [
+    {
+      key: "1",
+      type: "group",
+      label: "Sort by",
+      children: [
+        {
+          label: "All Bills",
+          key: "Status.All",
+        },
+        {
+          label: "Open Bills",
+          key: "Status.Open",
+        },
+        {
+          label: "Draft Bills",
+          key: "Status.Draft",
+        },
+        {
+          label: "Paid Bills",
+          key: "Status.Paid",
+        },
+      ],
+    },
+  ];
+  const onStatusMenuClick = (e) => {
+    console.log("click", e);
+    setSelectedStatusItem(() => e.key);
+    setSearchParams({
+      filter_by: e.key,
+      per_page: per_page,
+      page: page,
+      sort_column: sort_column,
+      sort_order: sort_order,
+    });
+  };
+  const menuPropsStatus = {
+    items: statusItems,
+    selectable: true,
+    selectedKeys: selectedStatusItem,
+    onClick: onStatusMenuClick,
+  };
+  const title = statusItems[0].children.find(
+    (value) => value.key === selectedStatusItem
+  );
   return (
     <ContentLayout>
       {isLoading ? (
         <Spin style={{ marginTop: 20 }} size="large" />
       ) : (
         <>
-          <ContentHeader title={"All Bills"}>
+          <ContentHeader
+            title={
+              <Dropdown menu={menuPropsStatus} arrow>
+                <h1
+                  style={{ margin: 0, cursor: "pointer" }}
+                  onClick={(e) => e.preventDefault()}
+                >
+                  {title.label}
+                  <DownOutlined style={{ color: token.colorPrimary }} />
+                </h1>
+              </Dropdown>
+            }
+          >
             <div
               style={{
                 display: "flex",
@@ -315,7 +427,7 @@ const Bills = () => {
               >
                 <span style={{ marginLeft: "4px" }}>New</span>
               </Button>
-              <Dropdown menu={menuProps} trigger={["click"]}>
+              <Dropdown menu={menuProps} trigger={["click"]} arrow>
                 <Button
                   style={{
                     display: "flex",
@@ -340,7 +452,6 @@ const Bills = () => {
               style={{ width: "100%", height: "100%" }}
             >
               <Table
-                //components={components}
                 columns={columns}
                 rowKey={(record) => record.id}
                 dataSource={bills}

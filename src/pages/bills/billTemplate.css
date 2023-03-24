@@ -1,0 +1,59 @@
+.template-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+  margin: auto;
+  padding: 20px;
+  margin-top: 30px;
+  box-shadow: 0px 2px 31px -3px rgba(97, 91, 91, 0.8);
+  -webkit-box-shadow: 0px 2px 31px -3px rgba(97, 91, 91, 0.8);
+  -moz-box-shadow: 0px 2px 31px -3px rgba(97, 91, 91, 0.8);
+}
+.template-container .top {
+  display: flex;
+  justify-content: space-between;
+}
+.template-container .top .left {
+  font-weight: 500;
+}
+.template-container .top .right {
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.template-container .top .right h1 {
+  align-items: flex-end;
+  letter-spacing: 5px;
+  font-size: 32px;
+}
+.template-container .top .right p {
+  font-weight: 500;
+}
+.template-container .top .right .balance-due {
+  margin-bottom: 0px;
+  font-size: 12px;
+}
+.template-container .top .right .pkr {
+  font-size: 20px;
+  margin-top: 5px;
+}
+.template-container .bottom {
+  display: flex;
+  justify-content: space-between;
+}
+.template-container .bottom .left {
+  font-weight: 600;
+  align-items: end;
+}
+.template-container .bottom .right {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+.template-container .bottom .right div {
+  display: flex;
+  justify-content: space-between;
+  -moz-column-gap: 20px;
+       column-gap: 20px;
+}/*# sourceMappingURL=billTemplate.css.map */

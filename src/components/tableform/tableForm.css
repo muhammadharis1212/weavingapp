@@ -1,0 +1,64 @@
+.table--form .editable-row .ant-table-cell {
+  padding: 1px;
+}
+.table--form .editable-row .ant-table-cell .editable-cell {
+  position: relative;
+}
+.table--form .editable-row .ant-table-cell .editable-cell-value-wrap {
+  padding: 16px 12px;
+  cursor: pointer;
+}
+.table--form .editable-row .ant-table-cell .editable-cell-value-wrap-quantity {
+  text-align: right;
+}
+.table--form .editable-row .ant-table-cell .editable-cell-value-wrap-rate {
+  text-align: right;
+}
+.table--form .editable-row .ant-table-cell .ant-select {
+  min-width: 95%;
+  margin-left: 5px;
+}
+.table--form .editable-row .ant-table-cell .ant-input-number {
+  min-width: 100%;
+  text-justify: newspaper;
+}
+.table--form .editable-row .ant-table-cell .operation--button {
+  padding: 16px 12px;
+}
+.table--form .editable-row .ant-table-cell .amount--column {
+  padding: 16px 12px;
+  text-align: right;
+}
+.table--form .editable-row:hover .editable-cell-value-wrap {
+  padding: 16px 11px;
+  margin: 0 4px;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+}
+.table--form .table--bottom {
+  display: flex;
+  justify-content: space-between;
+  margin: 30px;
+}
+.table--form .table--bottom .card--container {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  margin-right: 20px;
+  padding: 10px 30px;
+  border-radius: 10px;
+}
+.table--form .table--bottom .card--container .subtotal {
+  display: flex;
+  justify-content: space-between;
+}
+.table--form .table--bottom .card--container .adjustment {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.table--form .table--bottom .card--container .total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}/*# sourceMappingURL=tableForm.css.map */

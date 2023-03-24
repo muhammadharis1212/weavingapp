@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getSupplier } from "../../api/suppliers/getSupplier";
 import { searchSuppliers } from "../../api/suppliers/searchSuppliers";
 import { allSuppliers } from "../../api/suppliers/suppliers";
 
@@ -20,6 +21,18 @@ export const fetchSuppliers = createAsyncThunk(
     }
   }
 );
+export const fetchSupplierById = createAsyncThunk(
+  "suppliers/byID",
+  async (data) => {
+    const { authToken, id } = data;
+    try {
+      const res = await getSupplier(authToken, id);
+      return res.data;
+    } catch (error) {
+      return error.res;
+    }
+  }
+);
 
 export const suppliersSlice = createSlice({
   name: "suppliers",
@@ -34,6 +47,20 @@ export const suppliersSlice = createSlice({
       state.error = "";
     });
     builder.addCase(fetchSuppliers.rejected, (state, action) => {
+      state.isLoading = false;
+      state.suppliers = [];
+      state.error = action.error.message;
+    });
+
+    builder.addCase(fetchSupplierById.pending, (state) => {
+      state.isLoading = true;
+    });
+    builder.addCase(fetchSupplierById.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.suppliers = [action.payload];
+      state.error = "";
+    });
+    builder.addCase(fetchSupplierById.rejected, (state, action) => {
       state.isLoading = false;
       state.suppliers = [];
       state.error = action.error.message;

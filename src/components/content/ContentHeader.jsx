@@ -14,7 +14,7 @@ const ContentHeader = ({ title, children }) => {
       }}
     >
       <div>
-        <h2 style={{ margin: 0, marginBottom: 10 }}>{title}</h2>
+        <div style={{ margin: 0, marginBottom: 10 }}>{title}</div>
       </div>
       <div style={{ marginBottom: 10 }}>{children}</div>
     </div>
